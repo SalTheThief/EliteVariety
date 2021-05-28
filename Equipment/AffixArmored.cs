@@ -293,7 +293,7 @@ namespace EliteVariety.Equipment
                         Renderer renderer = shieldProgressBar[i];
 
                         renderer.GetPropertyBlock(materialPropertyBlock);
-                        materialPropertyBlock.SetFloat("_EmPower", 8f * Mathf.Clamp01((progress - ((float)i / (float)shieldProgressBar.Count)) / (1f / (float)shieldProgressBar.Count)));
+                        materialPropertyBlock.SetFloat("_EmPower", 2f * Mathf.Clamp01((progress - ((float)i / (float)shieldProgressBar.Count)) / (1f / (float)shieldProgressBar.Count)));
                         renderer.SetPropertyBlock(materialPropertyBlock);
                     }
                 }
