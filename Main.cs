@@ -231,11 +231,13 @@ namespace EliteVariety
         public static class Equipment
         {
             public static EquipmentDef AffixArmored;
+            public static EquipmentDef AffixBuffing;
         }
 
         public static class Buffs
         {
             public static BuffDef AffixArmored;
+            public static BuffDef AffixBuffing;
             public static BuffDef ArmoredHeavyStun;
             public static BuffDef ArmoredSelfBuff;
         }
@@ -243,6 +245,7 @@ namespace EliteVariety
         public static class Elites
         {
             public static EliteDef Armored;
+            public static EliteDef Buffing;
         }
     }
 }
