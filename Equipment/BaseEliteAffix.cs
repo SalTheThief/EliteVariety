@@ -129,5 +129,12 @@ namespace EliteVariety.Equipment
             material.SetFloat("_FresnelPower", fresnelPower);
             material.SetTexture("_FresnelRamp", customFresnelRamp);
         }
+
+        public void AdjustElitePickupMaterial(Color color, float fresnelPower)
+        {
+            Material material = model.GetComponentInChildren<Renderer>().sharedMaterial;
+            material.SetColor("_Color", color);
+            material.SetFloat("_FresnelPower", fresnelPower);
+        }
     }
 }
