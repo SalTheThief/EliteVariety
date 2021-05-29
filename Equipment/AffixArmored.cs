@@ -79,8 +79,8 @@ namespace EliteVariety.Equipment
                 AddDisplayRule("ClayBossBody", "PotBase", new Vector3(1.47037F, 0.14472F, 1.15155F), new Vector3(356.2741F, 328.1895F, 8.26984F), new Vector3(0.24784F, 0.24784F, 0.24784F));
                 AddDisplayRule("ClayBossBody", "PotBase", new Vector3(-1.42564F, 0.14467F, 1.15156F), new Vector3(3.53829F, 214.9017F, 8.46569F), new Vector3(0.24784F, 0.24784F, 0.24784F));
                 AddDisplayRule("ClayBossBody", "PotBase", new Vector3(0F, 0.15405F, -1.82541F), new Vector3(0F, 90F, 14.66357F), new Vector3(0.24784F, 0.24784F, 0.24784F));
-                AddDisplayRule("TitanBody", "UpperArmL", new Vector3(0.87366F, -4.70598F, 1.98238F), new Vector3(355.3532F, 107.7925F, 185.3229F), new Vector3(0.88972F, 0.88972F, 0.88972F));
-                AddDisplayRule("TitanGoldBody", "UpperArmL", new Vector3(0.87366F, -4.70598F, 1.98238F), new Vector3(355.3532F, 107.7925F, 185.3229F), new Vector3(0.88972F, 0.88972F, 0.88972F));
+                AddDisplayRule("TitanBody", "UpperArmL", new Vector3(1.86778F, 0.0468F, -0.43658F), new Vector3(354.5138F, 195.9479F, 182.7553F), new Vector3(2.25074F, 2.25074F, 2.25074F));
+                AddDisplayRule("TitanGoldBody", "UpperArmL", new Vector3(1.86778F, 0.0468F, -0.43658F), new Vector3(354.5138F, 195.9479F, 182.7553F), new Vector3(2.25074F, 2.25074F, 2.25074F));
                 AddDisplayRule("VagrantBody", "Hull", new Vector3(0F, 0.95729F, 1.16298F), new Vector3(0F, 270F, 29.51815F), new Vector3(0.24784F, 0.24784F, 0.24784F));
                 AddDisplayRule("VagrantBody", "Hull", new Vector3(-0.98958F, 0.95724F, -0.58474F), new Vector3(0.00009F, 152.7161F, 29.51817F), new Vector3(0.24784F, 0.24784F, 0.24784F));
                 AddDisplayRule("VagrantBody", "Hull", new Vector3(0.98958F, 0.95708F, -0.58468F), new Vector3(0.00012F, 36.37237F, 29.51816F), new Vector3(0.24784F, 0.24784F, 0.24784F));
