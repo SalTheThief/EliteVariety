@@ -136,5 +136,19 @@ namespace EliteVariety.Equipment
             material.SetColor("_Color", color);
             material.SetFloat("_FresnelPower", fresnelPower);
         }
+
+        [ConCommand(commandName = "elitevariety_pickup_mat", flags = ConVarFlags.None, helpText = "Configure elite pickup material")]
+        public static void CCAdjustElitePickupMaterial(ConCommandArgs args)
+        {
+            MysticsRisky2Utils.BaseAssetTypes.BaseEquipment affixEquipment = loadedEquipment.FirstOrDefault(x => x.equipmentDef.name.StartsWith(args[0]) || Language.currentLanguage.GetLocalizedStringByToken(x.equipmentDef.nameToken).StartsWith(args[0]));
+            if (affixEquipment != null)
+            {
+                BaseEliteAffix eliteAffix = affixEquipment as BaseEliteAffix;
+                if (eliteAffix != null)
+                {
+                    eliteAffix.AdjustElitePickupMaterial(new Color32(byte.Parse(args[1]), byte.Parse(args[1]), byte.Parse(args[1]), 255), float.Parse(args[2]));
+                }
+            }
+        }
     }
 }

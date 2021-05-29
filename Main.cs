@@ -76,6 +76,8 @@ namespace EliteVariety
             On.RoR2.CharacterBody.Awake += CharacterBody_Awake;
 
             On.RoR2.Language.GetLocalizedStringByToken += Language_GetLocalizedStringByToken;
+
+            ConCommandHelper.Load(typeof(Equipment.BaseEliteAffix).GetMethod("CCAdjustElitePickupMaterial", bindingFlagAll));
         }
 
         private static void CharacterBody_Awake(On.RoR2.CharacterBody.orig_Awake orig, CharacterBody self)
