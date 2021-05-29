@@ -11,7 +11,7 @@ namespace EliteVariety.Equipment
     {
         public override GameObject LoadModel(string assetName)
         {
-            return Main.AssetBundle.LoadAsset<GameObject>("Assets/EliteVariety/Misc/GenericAffixPickup.prefab");
+            return R2API.PrefabAPI.InstantiateClone(Main.AssetBundle.LoadAsset<GameObject>("Assets/EliteVariety/Misc/GenericAffixPickup.prefab"), assetName + "AffixPickup", false);
         }
         public override bool FollowerModelExists(string assetName)
         {
