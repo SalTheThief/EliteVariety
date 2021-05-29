@@ -97,7 +97,7 @@ namespace EliteVariety.Equipment
                     {
                         Vector3 scale = Vector3.one * 0.38363F * Mathf.Pow(0.934782609f, i - 1);
                         AddDisplayRule(worm, "Neck" + i.ToString(), new Vector3(0F, 0.67666F + 0.03293F * (i - 1), 0.75189F - 0.02657F * (i - 1)), new Vector3(0F, 270F, 350.3946F), scale);
-                        AddDisplayRule(worm, "Neck" + i.ToString(), new Vector3(1.05941F, 0.66706F + 0.03293F * (i - 1), -0.30037F + 0.02657F * (i - 1)), new Vector3(0F, 0F, 350.3946F), scale);
+                        AddDisplayRule(worm, "Neck" + i.ToString(), new Vector3(1.05941F, 0.66706F + 0.03293F * (i - 1), -0.30037F - 0.02657F * (i - 1)), new Vector3(0F, 0F, 350.3946F), scale);
                         AddDisplayRule(worm, "Neck" + i.ToString(), new Vector3(0F, 0.67666F + 0.03293F * (i - 1), -1.298979F + 0.02657F * (i - 1)), new Vector3(0F, 90F, 350.3946F), scale);
                         AddDisplayRule(worm, "Neck" + i.ToString(), new Vector3(-1.05941F + 0.02657F * (i - 1), 0.66706F + 0.03293F * (i - 1), -0.30037F), new Vector3(0F, 180F, 350.3946F), scale);
                     }
