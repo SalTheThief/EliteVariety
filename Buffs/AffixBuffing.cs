@@ -250,7 +250,7 @@ namespace EliteVariety.Buffs
             if (damageInfo.procCoefficient > 0 && attackerInfo.body && attackerInfo.body.HasBuff(buffDef))
             {
                 EliteVarietyAffixBuffingBehavior component = attackerInfo.body.GetComponent<EliteVarietyAffixBuffingBehavior>();
-                if (component) component.TriggerSpecialWard(2f * damageInfo.procCoefficient);
+                if (component) component.TriggerSpecialWard(4f * damageInfo.procCoefficient);
             }
         }
     }
