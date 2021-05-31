@@ -75,8 +75,6 @@ namespace EliteVariety
 
             On.RoR2.CharacterBody.Awake += CharacterBody_Awake;
 
-            On.RoR2.Language.GetLocalizedStringByToken += Language_GetLocalizedStringByToken;
-
             ConCommandHelper.Load(typeof(Equipment.BaseEliteAffix).GetMethod("CCAdjustElitePickupMaterial", bindingFlagAll));
         }
 
@@ -84,31 +82,6 @@ namespace EliteVariety
         {
             orig(self);
             self.gameObject.AddComponent<EliteVarietyBodyFields>();
-        }
-
-        private static string Language_GetLocalizedStringByToken(On.RoR2.Language.orig_GetLocalizedStringByToken orig, Language self, string token)
-        {
-            string localizedString = orig(self, token);
-
-            string chestCostReplacementToken = "ELITEVARIETYCHESTCOST";
-            if (localizedString.Contains(chestCostReplacementToken))
-            {
-                string chestCostString = "$25";
-                CostTypeDef costTypeDef = CostTypeCatalog.GetCostTypeDef(CostTypeIndex.Money);
-                if (costTypeDef != null)
-                {
-                    sharedStringBuilder.Clear();
-                    costTypeDef.BuildCostStringStyled(25, sharedStringBuilder, true, false);
-                    chestCostString = string.Format(
-                        "<color=#{1}>{0}</color>",
-                        sharedStringBuilder.ToString(),
-                        ColorUtility.ToHtmlStringRGB(costTypeDef.GetCostColor(true))
-                    );
-                }
-                localizedString = string.Format(localizedString.Replace(chestCostReplacementToken, "{0}"), chestCostString);
-            }
-
-            return localizedString;
         }
 
         internal static StringBuilder sharedStringBuilder = new StringBuilder();
