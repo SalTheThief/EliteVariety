@@ -84,8 +84,6 @@ namespace EliteVariety.Equipment
                 AddDisplayRule("VagrantBody", "Hull", new Vector3(0F, 0.95729F, 1.16298F), new Vector3(0F, 270F, 29.51815F), new Vector3(0.24784F, 0.24784F, 0.24784F));
                 AddDisplayRule("VagrantBody", "Hull", new Vector3(-0.98958F, 0.95724F, -0.58474F), new Vector3(0.00009F, 152.7161F, 29.51817F), new Vector3(0.24784F, 0.24784F, 0.24784F));
                 AddDisplayRule("VagrantBody", "Hull", new Vector3(0.98958F, 0.95708F, -0.58468F), new Vector3(0.00012F, 36.37237F, 29.51816F), new Vector3(0.24784F, 0.24784F, 0.24784F));
-                AddDisplayRule("MagmaWormBody", "Head", new Vector3(0.00001F, 0.20321F, 0.35653F), new Vector3(0F, 270F, 338.4637F), new Vector3(0.50219F, 0.50219F, 0.50219F));
-                AddDisplayRule("MagmaWormBody", "Head", new Vector3(-0.00004F, 0.21744F, -1.24892F), new Vector3(0F, 90F, 350.3356F), new Vector3(0.50219F, 0.50219F, 0.50219F));
                 string[] worms = new string[]
                 {
                     "MagmaWormBody",
@@ -93,11 +91,13 @@ namespace EliteVariety.Equipment
                 };
                 foreach (string worm in worms)
                 {
+                    AddDisplayRule(worm, "Head", new Vector3(0.00001F, 0.20321F, 0.35653F), new Vector3(0F, 270F, 338.4637F), new Vector3(0.50219F, 0.50219F, 0.50219F));
+                    AddDisplayRule(worm, "Head", new Vector3(-0.00004F, 0.21744F, -1.24892F), new Vector3(0F, 90F, 350.3356F), new Vector3(0.50219F, 0.50219F, 0.50219F));
                     for (var i = 1; i <= 16; i++)
                     {
                         Vector3 scale = Vector3.one * 0.38363F * Mathf.Pow(0.934782609f, i - 1);
                         AddDisplayRule(worm, "Neck" + i.ToString(), new Vector3(0F, 0.67666F + 0.03293F * (i - 1), 0.75189F - 0.02657F * (i - 1)), new Vector3(0F, 270F, 350.3946F), scale);
-                        AddDisplayRule(worm, "Neck" + i.ToString(), new Vector3(1.05941F, 0.66706F + 0.03293F * (i - 1), -0.30037F - 0.02657F * (i - 1)), new Vector3(0F, 0F, 350.3946F), scale);
+                        AddDisplayRule(worm, "Neck" + i.ToString(), new Vector3(1.05941F - 0.02657F * (i - 1), 0.66706F + 0.03293F * (i - 1), -0.30037F), new Vector3(0F, 0F, 350.3946F), scale);
                         AddDisplayRule(worm, "Neck" + i.ToString(), new Vector3(0F, 0.67666F + 0.03293F * (i - 1), -1.298979F + 0.02657F * (i - 1)), new Vector3(0F, 90F, 350.3946F), scale);
                         AddDisplayRule(worm, "Neck" + i.ToString(), new Vector3(-1.05941F + 0.02657F * (i - 1), 0.66706F + 0.03293F * (i - 1), -0.30037F), new Vector3(0F, 180F, 350.3946F), scale);
                     }
