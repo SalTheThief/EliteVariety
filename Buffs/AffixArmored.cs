@@ -66,7 +66,7 @@ namespace EliteVariety.Buffs
         {
             if (damageInfo.procCoefficient > 0 && attackerInfo.body && victimInfo.body && attackerInfo.healthComponent && attackerInfo.body.HasBuff(buffDef))
             {
-                victimInfo.body.AddTimedBuff(EliteVarietyContent.Buffs.ArmoredHeavyStun, 1f * damageInfo.procCoefficient);
+                victimInfo.body.AddTimedBuff(EliteVarietyContent.Buffs.ArmoredHeavyStun, 0.75f * damageInfo.procCoefficient);
             }
         }
     }
