@@ -57,6 +57,7 @@ namespace EliteVariety.Equipment
                 AddDisplayRule("ImpBody", "Neck", new Vector3(0F, -0.38947F, 0.10343F), new Vector3(0F, 90F, 0.68676F), new Vector3(0.35844F, 0.35844F, 0.35844F));
                 AddDisplayRule("VultureBody", "Chest", new Vector3(-0.00005F, -0.79747F, 1.95463F), new Vector3(6.13429F, 269.3485F, 83.92575F), new Vector3(3.8124F, 3.8124F, 3.8124F));
                 AddDisplayRule("RoboBallMiniBody", "ROOT", new Vector3(0.81676F, 0.00111F, -0.02604F), new Vector3(0F, 0F, 347.2889F), new Vector3(0.97745F, 0.97745F, 0.97745F));
+                AddDisplayRule("RoboBallMiniBody", "ROOT", new Vector3(-0.81676F, 0.00111F, -0.02604F), new Vector3(0F, 0F, -347.2889F), new Vector3(0.97745F, 0.97745F, 0.97745F));
                 AddDisplayRule("MiniMushroomBody", "Head", new Vector3(1.00691F, 0.36443F, 0F), new Vector3(-0.00001F, 180F, 264.1599F), new Vector3(1.10492F, 1.08723F, 1.10492F));
                 AddDisplayRule("BellBody", "Chain", new Vector3(0F, 1.12031F, 0F), new Vector3(0F, 335.945F, 180F), new Vector3(1.593F, 1.593F, 1.593F));
                 AddDisplayRule("BeetleGuardBody", "Chest", new Vector3(-0.10637F, 0.34776F, -1.87907F), new Vector3(355.6954F, 274.0369F, 21.01935F), new Vector3(2.50349F, 2.50349F, 2.50349F));
@@ -73,7 +74,6 @@ namespace EliteVariety.Equipment
                 AddDisplayRule("TitanBody", "Chest", new Vector3(0.89643F, 3.32113F, -2.67202F), new Vector3(0F, 270F, 0F), new Vector3(3.64626F, 3.64626F, 3.64626F));
                 AddDisplayRule("TitanGoldBody", "Chest", new Vector3(0.89643F, 3.32113F, -2.67202F), new Vector3(0F, 270F, 0F), new Vector3(3.64626F, 3.64626F, 3.64626F));
                 AddDisplayRule("VagrantBody", "Hull", new Vector3(0F, 0.98831F, -0.73006F), new Vector3(0F, 270F, 337.7484F), new Vector3(0.72348F, 0.72348F, 0.72348F));
-                AddDisplayRule("MagmaWormBody", "Head", new Vector3(-0.04405F, 1.49652F, 0.59592F), new Vector3(6.87863F, 90F, 48.29213F), new Vector3(1.05666F, 1.05666F, 1.05666F));
                 string[] worms = new string[]
                 {
                     "MagmaWormBody",
@@ -81,13 +81,14 @@ namespace EliteVariety.Equipment
                 };
                 foreach (string worm in worms)
                 {
+                    AddDisplayRule(worm, "Head", new Vector3(-0.04405F, 1.49652F, 0.59592F), new Vector3(6.87863F, 90F, 48.29213F), new Vector3(1.05666F, 1.05666F, 1.05666F));
                     for (var i = 1; i <= 16; i++)
                     {
                         Vector3 scale = Vector3.one * 0.5777F * Mathf.Pow(0.934782609f, i - 1);
                         if ((i % 4) == 0) AddDisplayRule(worm, "Neck" + i.ToString(), new Vector3(0F, 0.70959F + 0.03293F * (i - 1), 0.72532F - 0.02657F * (i - 1)), new Vector3(0F, 90F, 42.11422F), scale);
-                        if ((i % 4) == 1) AddDisplayRule(worm, "Neck" + i.ToString(), new Vector3(1.05941F, 0.69999F + 0.03293F * (i - 1), -0.2738F - 0.02657F * (i - 1)), new Vector3(0F, 0F, 317.7116F), scale);
+                        if ((i % 4) == 1) AddDisplayRule(worm, "Neck" + i.ToString(), new Vector3(1.05941F - 0.02657F * (i - 1), 0.69999F + 0.03293F * (i - 1), -0.2738F), new Vector3(0F, 0F, 317.7116F), scale);
                         if ((i % 4) == 2) AddDisplayRule(worm, "Neck" + i.ToString(), new Vector3(0F, 0.70959F + 0.03293F * (i - 1), -1.27241F + 0.02657F * (i - 1)), new Vector3(0F, 270F, 40.70816F), scale);
-                        if ((i % 4) == 3) AddDisplayRule(worm, "Neck" + i.ToString(), new Vector3(-1.03284F + 0.02657F * (i - 1), 0.69999F + 0.03293F * (i - 1), -0.30037F), new Vector3(0F, 180F, 317.0171F), scale);
+                        if ((i % 4) == 3) AddDisplayRule(worm, "Neck" + i.ToString(), new Vector3(-1.03284F + 0.02657F * (i - 1), 0.69999F + 0.03293F * (i - 1), -0.2738F), new Vector3(0F, 180F, 317.0171F), scale);
                     }
                 }
                 AddDisplayRule("RoboBallBossBody", "Shell", new Vector3(0.48786F, 0.59529F, -0.18982F), new Vector3(321.6017F, 270F, 352.831F), new Vector3(0.27219F, 0.27219F, 0.27219F));
