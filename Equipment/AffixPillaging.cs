@@ -92,11 +92,6 @@ namespace EliteVariety.Equipment
                 AddDisplayRule("GrandParentBody", "Head", new Vector3(0F, 0.52978F, -0.55073F), new Vector3(0F, 0F, 0F), new Vector3(1.32372F, 1.32372F, 1.32372F));
                 AddDisplayRule("ScavBody", "Chest", new Vector3(0F, 6.86485F, 2.6171F), new Vector3(25.44132F, 0F, 0F), new Vector3(4.73313F, 4.73313F, 4.73313F));
             };
-            On.RoR2.BuffCatalog.Init += (orig) =>
-            {
-                orig();
-                equipmentDef.passiveBuffDef = EliteVarietyContent.Buffs.AffixPillaging;
-            };
 
             if (Main.aspectAbilitiesEnabled) AspectAbilitiesSupport();
 
@@ -127,6 +122,12 @@ namespace EliteVariety.Equipment
             EliteVarietyContent.Resources.effectPrefabs.Add(itemAcquiredOrbEffect);
 
             onUseEffect = Resources.Load<GameObject>("Prefabs/Effects/MoneyPackPickupEffect");
+        }
+
+        public override void AfterContentPackLoaded()
+        {
+            base.AfterContentPackLoaded();
+            equipmentDef.passiveBuffDef = EliteVarietyContent.Buffs.AffixPillaging;
         }
 
         public override void AspectAbilitiesSupport()

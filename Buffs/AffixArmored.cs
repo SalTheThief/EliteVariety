@@ -18,10 +18,15 @@ namespace EliteVariety.Buffs
         {
             base.OnLoad();
             buffDef.name = "AffixArmored";
-            buffDef.eliteDef = EliteVarietyContent.Elites.Armored;
             On.RoR2.CharacterBody.OnInventoryChanged += CharacterBody_OnInventoryChanged;
             On.RoR2.CharacterBody.RecalculateStats += CharacterBody_RecalculateStats;
             GenericGameEvents.OnHitEnemy += GenericGameEvents_OnHitEnemy;
+        }
+
+        public override void AfterContentPackLoaded()
+        {
+            base.AfterContentPackLoaded();
+            buffDef.eliteDef = EliteVarietyContent.Elites.Armored;
         }
 
         public void CharacterBody_OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)

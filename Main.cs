@@ -170,6 +170,9 @@ namespace EliteVariety
                 yield return null;
                 num = i + 1;
             }
+            MysticsRisky2Utils.ContentManagement.ContentLoadHelper.InvokeAfterContentPackLoaded<EliteVariety.Buffs.BaseBuff>(Main.executingAssembly);
+            MysticsRisky2Utils.ContentManagement.ContentLoadHelper.InvokeAfterContentPackLoaded<EliteVariety.Equipment.BaseEquipment>(Main.executingAssembly);
+            MysticsRisky2Utils.ContentManagement.ContentLoadHelper.InvokeAfterContentPackLoaded<EliteVariety.Elites.BaseElite>(Main.executingAssembly);
             loadDispatchers = null;
             yield break;
         }

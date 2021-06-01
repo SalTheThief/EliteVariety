@@ -114,11 +114,6 @@ namespace EliteVariety.Equipment
                 AddDisplayRule("GrandParentBody", "Head", new Vector3(0F, 8.3197F, 0.00001F), new Vector3(0F, 270F, 0F), new Vector3(1.8948F, 1.8948F, 1.8948F));
                 AddDisplayRule("ScavBody", "Stomach", new Vector3(0.23239F, 4.35636F, -8.43252F), new Vector3(9.37492F, 90.28594F, 11.99715F), new Vector3(1.72618F, 1.72618F, 1.72618F));
             };
-            On.RoR2.BuffCatalog.Init += (orig) =>
-            {
-                orig();
-                equipmentDef.passiveBuffDef = EliteVarietyContent.Buffs.AffixArmored;
-            };
             On.RoR2.CharacterBody.OnInventoryChanged += CharacterBody_OnInventoryChanged;
             ChildLocatorAdditions.list.Add(new ChildLocatorAdditions.Addition
             {
@@ -216,6 +211,12 @@ namespace EliteVariety.Equipment
             vfxAttributes.vfxIntensity = VFXAttributes.VFXIntensity.Medium;
             vfxAttributes.vfxPriority = VFXAttributes.VFXPriority.Medium;
             EliteVarietyContent.Resources.effectPrefabs.Add(selfBuffUseEffect);
+        }
+
+        public override void AfterContentPackLoaded()
+        {
+            base.AfterContentPackLoaded();
+            equipmentDef.passiveBuffDef = EliteVarietyContent.Buffs.AffixArmored;
         }
 
         public override void AspectAbilitiesSupport()

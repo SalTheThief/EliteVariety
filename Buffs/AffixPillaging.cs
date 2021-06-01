@@ -26,7 +26,6 @@ namespace EliteVariety.Buffs
 		{
 			base.OnLoad();
 			buffDef.name = "AffixPillaging";
-			buffDef.eliteDef = EliteVarietyContent.Elites.Pillaging;
 			On.RoR2.CharacterBody.OnInventoryChanged += CharacterBody_OnInventoryChanged;
             GenericGameEvents.OnTakeDamage += GenericGameEvents_OnTakeDamage;
 
@@ -73,7 +72,13 @@ namespace EliteVariety.Buffs
             On.RoR2.DeathRewards.OnKilledServer += DeathRewards_OnKilledServer;
 		}
 
-        public void CharacterBody_OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
+		public override void AfterContentPackLoaded()
+		{
+			base.AfterContentPackLoaded();
+			buffDef.eliteDef = EliteVarietyContent.Elites.Pillaging;
+		}
+
+		public void CharacterBody_OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
         {
             orig(self);
             if (NetworkServer.active) self.AddItemBehavior<EliteVarietyAffixPillagingBehavior>(self.HasBuff(buffDef) ? 1 : 0);

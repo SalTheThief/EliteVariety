@@ -128,17 +128,18 @@ namespace EliteVariety.Equipment
                 transformLocation = "GrandparentArmature/ROOT/base/stomach/chest",
                 childName = "Chest"
             });
-            On.RoR2.BuffCatalog.Init += (orig) =>
-            {
-                orig();
-                equipmentDef.passiveBuffDef = EliteVarietyContent.Buffs.AffixBuffing;
-            };
 
             if (Main.aspectAbilitiesEnabled) AspectAbilitiesSupport();
 
             useSound = ScriptableObject.CreateInstance<NetworkSoundEventDef>();
             useSound.eventName = "EliteVariety_Play_item_use_affixbuffing";
             EliteVarietyContent.Resources.networkSoundEventDefs.Add(useSound);
+        }
+
+        public override void AfterContentPackLoaded()
+        {
+            base.AfterContentPackLoaded();
+            equipmentDef.passiveBuffDef = EliteVarietyContent.Buffs.AffixBuffing;
         }
 
         public override void AspectAbilitiesSupport()

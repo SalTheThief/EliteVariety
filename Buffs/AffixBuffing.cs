@@ -29,7 +29,6 @@ namespace EliteVariety.Buffs
         {
             base.OnLoad();
             buffDef.name = "AffixBuffing";
-            buffDef.eliteDef = EliteVarietyContent.Elites.Buffing;
             On.RoR2.CharacterBody.OnInventoryChanged += CharacterBody_OnInventoryChanged;
             GenericGameEvents.OnHitEnemy += GenericGameEvents_OnHitEnemy;
 
@@ -73,6 +72,12 @@ namespace EliteVariety.Buffs
             specialBuffTriggerSound = ScriptableObject.CreateInstance<NetworkSoundEventDef>();
             specialBuffTriggerSound.eventName = "Play_teamWarCry_activate";
             EliteVarietyContent.Resources.networkSoundEventDefs.Add(specialBuffTriggerSound);
+        }
+
+        public override void AfterContentPackLoaded()
+        {
+            base.AfterContentPackLoaded();
+            buffDef.eliteDef = EliteVarietyContent.Elites.Buffing;
         }
 
         public void CharacterBody_OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)

@@ -7,11 +7,12 @@ namespace EliteVariety.Elites
             base.OnLoad();
             eliteDef.name = "Buffing";
             tier = 1;
-            On.RoR2.EquipmentCatalog.Init += (orig) =>
-            {
-                orig();
-                eliteDef.eliteEquipmentDef = EliteVarietyContent.Equipment.AffixBuffing;
-            };
+        }
+
+        public override void AfterContentPackLoaded()
+        {
+            base.AfterContentPackLoaded();
+            eliteDef.eliteEquipmentDef = EliteVarietyContent.Equipment.AffixBuffing;
         }
     }
 }
