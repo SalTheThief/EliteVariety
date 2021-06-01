@@ -26,16 +26,7 @@ namespace EliteVariety.Buffs
 		{
 			base.OnLoad();
 			buffDef.name = "AffixPillaging";
-			On.RoR2.EliteCatalog.Init += (orig) =>
-			{
-				orig();
-				buffDef.eliteDef = EliteVarietyContent.Elites.Pillaging;
-			};
-			On.RoR2.BuffCatalog.Init += (orig) =>
-			{
-				orig();
-				HG.ArrayUtils.ArrayAppend(ref BuffCatalog.eliteBuffIndices, buffDef.buffIndex);
-			};
+			buffDef.eliteDef = EliteVarietyContent.Elites.Pillaging;
 			On.RoR2.CharacterBody.OnInventoryChanged += CharacterBody_OnInventoryChanged;
             GenericGameEvents.OnTakeDamage += GenericGameEvents_OnTakeDamage;
 
