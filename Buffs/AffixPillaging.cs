@@ -84,7 +84,7 @@ namespace EliteVariety.Buffs
             if (NetworkServer.active) self.AddItemBehavior<EliteVarietyAffixPillagingBehavior>(self.HasBuff(buffDef) ? 1 : 0);
         }
 
-        public class EliteVarietyAffixPillagingBehavior : CharacterBody.ItemBehavior
+        public class EliteVarietyAffixPillagingBehavior : CharacterBody.ItemBehavior, ILifeBehavior
         {
             public float allyGoldStealRadius = 25f;
             public float allyGoldStealInterval = 1f;
@@ -164,6 +164,29 @@ namespace EliteVariety.Buffs
 
 				return false;
             }
+
+			public void OnDeathStart()
+            {
+				if (!body.master) return;
+
+				// on death, distribute all gold between living player allies
+				// this prevents pillaging AI allies from being detrimental to players
+				uint money = body.master.money;
+				int livingPlayerCount = Run.instance ? Run.instance.livingPlayerCount : 0;
+				if (livingPlayerCount != 0) money = (uint)Mathf.CeilToInt(money / (float)livingPlayerCount);
+				foreach (TeamComponent teamMember in TeamComponent.GetTeamMembers(body.master.teamIndex))
+                {
+					CharacterBody component = teamMember.GetComponent<CharacterBody>();
+					if (component && component.isPlayerControlled && component != body)
+					{
+						CharacterMaster master = component.master;
+						if (master)
+						{
+							master.GiveMoney(money);
+						}
+					}
+				}
+			}
         }
 
 		private void GenericGameEvents_OnTakeDamage(DamageReport damageReport)
