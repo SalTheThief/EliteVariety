@@ -30,7 +30,7 @@ namespace EliteVariety.Equipment
         {
             base.OnLoad();
             SetAssets("Pillaging");
-            AdjustElitePickupMaterial(new Color32(216, 207, 61, 255), 2f, true);
+            AdjustElitePickupMaterial(new Color32(216, 207, 61, 255), 7f, true);
             onSetupIDRS += () =>
             {
                 AddDisplayRule("CommandoBody", "Head", new Vector3(0F, 0.37741F, 0.02367F), new Vector3(5.07642F, 0F, 0F), new Vector3(0.14939F, 0.14939F, 0.14939F));

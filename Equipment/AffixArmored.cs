@@ -20,7 +20,7 @@ namespace EliteVariety.Equipment
         {
             base.OnLoad();
             SetAssets("Armored");
-            AdjustElitePickupMaterial(new Color32(229, 172, 172, 255), 4f, true);
+            AdjustElitePickupMaterial(new Color32(229, 172, 172, 255), 7f, true);
             GetFollowerModelMaterial().SetTexture("_EmTex", GetFollowerModelMaterial().GetTexture("_EmissionMap"));
             GetFollowerModelMaterial().SetColor("_EmColor", new Color32(200, 37, 51, 255));
             GetFollowerModelMaterial().SetFloat("_EmPower", 0f);
