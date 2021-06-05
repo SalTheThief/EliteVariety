@@ -136,6 +136,14 @@ namespace EliteVariety.Equipment
             {
                 equipmentDef = equipmentDef,
                 aiMaxUseDistance = Mathf.Infinity,
+                aiHealthFractionToUseChance = new AnimationCurve
+                {
+                    keys = new Keyframe[]
+                    {
+                        new Keyframe(0f, 1f),
+                        new Keyframe(1f, 1f)
+                    }
+                },
                 onUseOverride = (equipmentSlot) =>
                 {
                     if (EliteVarietyAffixPillagingNetworkedCost.instance)
