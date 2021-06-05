@@ -50,6 +50,10 @@ namespace EliteVariety.Buffs
             sandstormPrefab.transform.Find("Collision").gameObject.layer = LayerIndex.world.intVal;
             sandstormPrefab.gameObject.layer = LayerIndex.fakeActor.intVal;
 
+            DestroyOnTimer destroyOnTimer = sandstormPrefab.transform.Find("Indicator").gameObject.AddComponent<DestroyOnTimer>();
+            destroyOnTimer.duration = 10f;
+            destroyOnTimer.enabled = false;
+
             Utils.CopyChildren(Main.AssetBundle.LoadAsset<GameObject>("Assets/EliteVariety/Elites/Sandstorm/Vehicle.prefab"), vehiclePrefab);
             vehiclePrefab.AddComponent<NetworkTransform>();
             VehicleSeat vehicleSeat = vehiclePrefab.AddComponent<VehicleSeat>();
@@ -91,7 +95,7 @@ namespace EliteVariety.Buffs
         public void CharacterBody_OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
         {
             orig(self);
-            if (NetworkServer.active) self.AddItemBehavior<EliteVarietyAffixSandstormBehavior>(self.HasBuff(buffDef) ? 1 : 0);
+            if (NetworkServer.active) self.AddItemBehavior<EliteVarietyAffixSandstormBehavior>(self.HasBuff(buffDef) && self.healthComponent && self.healthComponent.alive ? 1 : 0);
         }
 
         public class EliteVarietyAffixSandstormBehavior : CharacterBody.ItemBehavior
@@ -113,7 +117,7 @@ namespace EliteVariety.Buffs
 
             public void OnDisable()
             {
-                if (sandstormObject) Object.Destroy(sandstormObject);
+                if (sandstormBehavior) sandstormBehavior.SelfDestruct();
             }
 
             public void Dash()
@@ -248,15 +252,30 @@ namespace EliteVariety.Buffs
                 NetworkServer.Spawn(vehicle);
             }
 
-            public void OnEnable()
-            {
-                if (indicator) indicator.gameObject.SetActive(true);
-            }
-
             public void OnDisable()
             {
-                if (indicator) indicator.gameObject.SetActive(false);
                 if (aimRequest != null) aimRequest.Dispose();
+            }
+
+            private bool selfDestructed = false;
+            public void SelfDestruct()
+            {
+                if (!selfDestructed)
+                {
+                    selfDestructed = true;
+                    if (indicator)
+                    {
+                        indicator.parent = null;
+                        foreach (ParticleSystem particleSystem in indicator.GetComponentsInChildren<ParticleSystem>())
+                        {
+                            ParticleSystem.EmissionModule emission = particleSystem.emission;
+                            emission.enabled = false;
+                        }
+                        DestroyOnTimer destroyOnTimer = indicator.GetComponent<DestroyOnTimer>();
+                        if (destroyOnTimer) destroyOnTimer.enabled = true;
+                    }
+                    Object.Destroy(gameObject);
+                }
             }
 
             public void OnAttachedBodyDiscovered(NetworkedBodyAttachment networkedBodyAttachment, CharacterBody attachedBody)
