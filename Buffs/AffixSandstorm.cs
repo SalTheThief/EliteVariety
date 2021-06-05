@@ -386,6 +386,8 @@ namespace EliteVariety.Buffs
             public float speed = 30f;
             public float selfDestructTimer = 3f;
             public float acceleration = 200f;
+            public bool directionLock = true;
+            public Vector3 direction;
 
             public void Awake()
             {
@@ -403,10 +405,15 @@ namespace EliteVariety.Buffs
 
                     if (vehicleSeat && vehicleSeat.currentPassengerInputBank && vehicleSeat.currentPassengerBody)
                     {
-                        Ray originalAimRay = vehicleSeat.currentPassengerInputBank.GetAimRay();
-                        originalAimRay = CameraRigController.ModifyAimRayIfApplicable(originalAimRay, gameObject, out _);
-                        rigidbody.MoveRotation(Quaternion.LookRotation(originalAimRay.direction));
-                        Vector3 targetVelocity = new Vector3(originalAimRay.direction.x, 0f, originalAimRay.direction.z) * speed * Mathf.Max(vehicleSeat.currentPassengerBody.moveSpeed / 7f, 1f);
+                        Vector3 chosenDirection = direction;
+                        if (!directionLock)
+                        {
+                            Ray originalAimRay = vehicleSeat.currentPassengerInputBank.GetAimRay();
+                            originalAimRay = CameraRigController.ModifyAimRayIfApplicable(originalAimRay, gameObject, out _);
+                            chosenDirection = originalAimRay.direction;
+                        }
+                        rigidbody.MoveRotation(Quaternion.LookRotation(chosenDirection));
+                        Vector3 targetVelocity = new Vector3(chosenDirection.x, 0f, chosenDirection.z) * speed * Mathf.Max(vehicleSeat.currentPassengerBody.moveSpeed / 7f, 1f);
                         Vector3 currentVelocity = new Vector3(rigidbody.velocity.x, 0f, rigidbody.velocity.z);
                         Vector3 velocityChange = Vector3.MoveTowards(currentVelocity, targetVelocity, acceleration * Time.fixedDeltaTime);
                         rigidbody.AddForce(velocityChange - currentVelocity, ForceMode.VelocityChange);
@@ -426,6 +433,7 @@ namespace EliteVariety.Buffs
                 Vector3 aimDirection = vehicleSeat.currentPassengerInputBank.aimDirection;
                 rigidbody.rotation = Quaternion.LookRotation(aimDirection);
                 rigidbody.velocity = aimDirection * initialSpeed * Mathf.Max(passengerBody.moveSpeed / 7f, 1f);
+                direction = aimDirection;
                 if (NetworkServer.active) passengerBody.AddBuff(RoR2Content.Buffs.ArmorBoost);
                 transform.localScale = new Vector3(passengerBody.bestFitRadius, passengerBody.bestFitRadius, passengerBody.bestFitRadius);
 
