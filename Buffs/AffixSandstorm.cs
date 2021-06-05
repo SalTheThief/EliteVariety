@@ -142,7 +142,7 @@ namespace EliteVariety.Buffs
             public float procCoefficient = 0.1f;
             public float dashProcCoefficient = 1f;
             public Vector3 force = Vector3.zero;
-            public Vector3 dashForce = Vector3.up * 2000f;
+            public Vector3 dashForce = Vector3.up * 1000f;
             public float tickFrequency = 10f;
             public float tickStopwatch = 0f;
             private float _radius = 0f;
