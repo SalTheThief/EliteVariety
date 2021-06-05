@@ -224,7 +224,6 @@ namespace EliteVariety.Equipment
             AspectAbilities.AspectAbilitiesPlugin.RegisterAspectAbility(new AspectAbilities.AspectAbility
             {
                 equipmentDef = equipmentDef,
-                aiMaxUseDistance = 60f,
                 onUseOverride = (equipmentSlot) =>
                 {
                     EffectData effectData = new EffectData
