@@ -330,7 +330,6 @@ namespace EliteVariety.Buffs
             public float speed = 30f;
             public float selfDestructTimer = 3f;
             public float acceleration = 200f;
-            public Vector3 aimDirection;
 
             public void Awake()
             {
@@ -348,12 +347,10 @@ namespace EliteVariety.Buffs
 
                     if (vehicleSeat && vehicleSeat.currentPassengerInputBank && vehicleSeat.currentPassengerBody)
                     {
-                        /*
                         Ray originalAimRay = vehicleSeat.currentPassengerInputBank.GetAimRay();
                         originalAimRay = CameraRigController.ModifyAimRayIfApplicable(originalAimRay, gameObject, out _);
-                        */
-                        rigidbody.MoveRotation(Quaternion.LookRotation(aimDirection));
-                        Vector3 targetVelocity = new Vector3(aimDirection.x, 0f, aimDirection.z) * speed * Mathf.Max(vehicleSeat.currentPassengerBody.moveSpeed / 7f, 1f);
+                        rigidbody.MoveRotation(Quaternion.LookRotation(originalAimRay.direction));
+                        Vector3 targetVelocity = new Vector3(originalAimRay.direction.x, 0f, originalAimRay.direction.z) * speed * Mathf.Max(vehicleSeat.currentPassengerBody.moveSpeed / 7f, 1f);
                         Vector3 currentVelocity = new Vector3(rigidbody.velocity.x, 0f, rigidbody.velocity.z);
                         Vector3 velocityChange = Vector3.MoveTowards(currentVelocity, targetVelocity, acceleration * Time.fixedDeltaTime);
                         rigidbody.AddForce(velocityChange - currentVelocity, ForceMode.VelocityChange);
@@ -370,7 +367,7 @@ namespace EliteVariety.Buffs
             {
                 CharacterBody passengerBody = passenger.GetComponent<CharacterBody>();
                 if (!vehicleSeat.currentPassengerInputBank || !passengerBody) return;
-                aimDirection = vehicleSeat.currentPassengerInputBank.aimDirection;
+                Vector3 aimDirection = vehicleSeat.currentPassengerInputBank.aimDirection;
                 rigidbody.rotation = Quaternion.LookRotation(aimDirection);
                 rigidbody.velocity = aimDirection * initialSpeed * Mathf.Max(passengerBody.moveSpeed / 7f, 1f);
                 if (NetworkServer.active) passengerBody.AddBuff(RoR2Content.Buffs.ArmorBoost);
