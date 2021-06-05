@@ -90,7 +90,7 @@ namespace EliteVariety.Buffs
             public float allyGoldStealInterval = 1f;
             public float allyGoldStealStopwatch = 0f;
             public uint allyGoldStealBaseAmount = 1u;
-            public int allyGoldStealMaxAllies = 3;
+            public int allyGoldStealMaxAllies = 5;
 			public EliteVarietyAffixPillagingDeathRewardsModifier deathRewardsModifier;
 
 			public void Start()
