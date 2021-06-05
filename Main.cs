@@ -209,6 +209,7 @@ namespace EliteVariety
             public static EquipmentDef AffixArmored;
             public static EquipmentDef AffixBuffing;
             public static EquipmentDef AffixPillaging;
+            public static EquipmentDef AffixSandstorm;
         }
 
         public static class Buffs
@@ -216,8 +217,10 @@ namespace EliteVariety
             public static BuffDef AffixArmored;
             public static BuffDef AffixBuffing;
             public static BuffDef AffixPillaging;
+            public static BuffDef AffixSandstorm;
             public static BuffDef ArmoredHeavyStun;
             public static BuffDef ArmoredSelfBuff;
+            public static BuffDef SandstormBlind;
         }
 
         public static class Elites
@@ -225,6 +228,7 @@ namespace EliteVariety
             public static EliteDef Armored;
             public static EliteDef Buffing;
             public static EliteDef Pillaging;
+            public static EliteDef Sandstorm;
         }
     }
 }
