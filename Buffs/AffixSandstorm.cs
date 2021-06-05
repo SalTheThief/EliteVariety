@@ -79,11 +79,12 @@ namespace EliteVariety.Buffs
             cameraTargetParams.cameraParams = characterCameraParams;
             cameraTargetParams.cameraPivotTransform = vehiclePrefab.transform.Find("CameraPivot");
             cameraTargetParams.fovOverride = -1;
-            cameraTargetParams.aimMode = CameraTargetParams.AimType.Aura;
 
             vehiclePrefab.AddComponent<EliteVarietySandstormVehicleBehavior>();
 
             NetworkingAPI.RegisterMessageType<EliteVarietySandstormBehavior.SyncRadius>();
+
+            SceneCamera.onSceneCameraPreRender += EliteVarietySandstormBehavior.OnSceneCameraPreRender;
         }
 
         public override void AfterContentPackLoaded()
@@ -169,12 +170,42 @@ namespace EliteVariety.Buffs
             }
             public CameraTargetParams.AimRequest aimRequest;
             public List<CharacterBody> bodiesHitThisTick;
+            public MaterialPropertyBlock materialPropertyBlock;
+            public List<IndicatorRendererRecolorInfo> indicatorRendererRecolorInfos;
+
+            public struct IndicatorRendererRecolorInfo
+            {
+                public Renderer renderer;
+                public Color originalColor;
+                public Color changedColor;
+            }
 
             public void Awake()
             {
                 networkedBodyAttachment = GetComponent<NetworkedBodyAttachment>();
                 teamFilter = GetComponent<TeamFilter>();
                 bodiesHitThisTick = new List<CharacterBody>();
+                materialPropertyBlock = new MaterialPropertyBlock();
+                indicatorRendererRecolorInfos = new List<IndicatorRendererRecolorInfo>();
+            }
+
+            public void Start()
+            {
+                foreach (Renderer renderer in indicator.GetComponentsInChildren<Renderer>())
+                {
+                    if (renderer.material)
+                    {
+                        Color originalColor = renderer.material.color;
+                        Color changedColor = renderer.material.color;
+                        changedColor.a *= 0.1f;
+                        indicatorRendererRecolorInfos.Add(new IndicatorRendererRecolorInfo
+                        {
+                            renderer = renderer,
+                            originalColor = originalColor,
+                            changedColor = changedColor
+                        });
+                    }
+                }
             }
 
             public void FixedUpdate()
@@ -194,12 +225,6 @@ namespace EliteVariety.Buffs
                 {
                     tickStopwatch = 0f;
                     Tick();
-                }
-
-                if (aimRequest == null && networkedBodyAttachment.attachedBodyObject)
-                {
-                    CameraTargetParams cameraTargetParams = networkedBodyAttachment.attachedBodyObject.GetComponent<CameraTargetParams>();
-                    if (cameraTargetParams) aimRequest = cameraTargetParams.RequestAimType(CameraTargetParams.AimType.Aura);
                 }
             }
 
@@ -252,8 +277,14 @@ namespace EliteVariety.Buffs
                 NetworkServer.Spawn(vehicle);
             }
 
+            public void OnEnable()
+            {
+                InstanceTracker.Add<EliteVarietySandstormBehavior>(this);
+            }
+
             public void OnDisable()
             {
+                InstanceTracker.Remove<EliteVarietySandstormBehavior>(this);
                 if (aimRequest != null) aimRequest.Dispose();
             }
 
@@ -318,6 +349,31 @@ namespace EliteVariety.Buffs
                 {
                     writer.Write(objID);
                     writer.Write(radius);
+                }
+            }
+
+            public static void OnSceneCameraPreRender(SceneCamera sceneCamera)
+            {
+                if (sceneCamera.cameraRigController)
+                {
+                    if (sceneCamera.cameraRigController.enableFading)
+                    {
+                        foreach (EliteVarietySandstormBehavior sandstorm in InstanceTracker.GetInstancesList<EliteVarietySandstormBehavior>())
+                        {
+                            if (sandstorm.networkedBodyAttachment && sandstorm.networkedBodyAttachment.attachedBody && sandstorm.networkedBodyAttachment.attachedBody == sceneCamera.cameraRigController.targetBody)
+                            {
+                                foreach (IndicatorRendererRecolorInfo indicatorRendererRecolorInfo in sandstorm.indicatorRendererRecolorInfos)
+                                {
+                                    if (indicatorRendererRecolorInfo.renderer)
+                                    {
+                                        indicatorRendererRecolorInfo.renderer.GetPropertyBlock(sandstorm.materialPropertyBlock);
+                                        sandstorm.materialPropertyBlock.SetColor("_Color", !sandstorm.dashActive ? indicatorRendererRecolorInfo.changedColor : indicatorRendererRecolorInfo.originalColor);
+                                        indicatorRendererRecolorInfo.renderer.SetPropertyBlock(sandstorm.materialPropertyBlock);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
