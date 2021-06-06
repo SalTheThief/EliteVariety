@@ -247,7 +247,7 @@ namespace EliteVariety.Buffs
                         {
                             if (characterBody.healthComponent && characterBody.healthComponent.alive)
                             {
-                                characterBody.healthComponent.TakeDamage(new DamageInfo
+                                DamageInfo damageInfo = new DamageInfo
                                 {
                                     attacker = networkedBodyAttachment.attachedBody.gameObject,
                                     inflictor = gameObject,
@@ -259,8 +259,11 @@ namespace EliteVariety.Buffs
                                     procCoefficient = (!dashActive ? procCoefficient : dashProcCoefficient),
                                     damageType = DamageType.Generic,
                                     procChainMask = default(ProcChainMask)
-                                });
+                                };
+                                characterBody.healthComponent.TakeDamage(damageInfo);
                                 if (alignedForce != Vector3.zero) characterBody.healthComponent.TakeDamageForce(alignedForce, true, true);
+                                GlobalEventManager.instance.OnHitEnemy(damageInfo, characterBody.gameObject);
+                                GlobalEventManager.instance.OnHitAll(damageInfo, characterBody.gameObject);
                             }
                         }
                     }
