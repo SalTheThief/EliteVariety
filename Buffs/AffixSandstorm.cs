@@ -260,7 +260,7 @@ namespace EliteVariety.Buffs
                                     damageType = DamageType.Generic,
                                     procChainMask = default(ProcChainMask)
                                 });
-                                characterBody.healthComponent.TakeDamageForce(alignedForce, true, true);
+                                if (alignedForce != Vector3.zero) characterBody.healthComponent.TakeDamageForce(alignedForce, true, true);
                             }
                         }
                     }
