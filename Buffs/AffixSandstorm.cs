@@ -389,6 +389,12 @@ namespace EliteVariety.Buffs
             public bool directionLock = true;
             public Vector3 direction;
 
+            public bool aiControlled = false;
+            public Vector3 aiTargetPosition;
+            public Vector3 aiClosestPointToTarget = Vector3.zero;
+            public float aiMaxDistanceUntilCancel = 15f;
+            public float aiClosestDistance = float.MaxValue;
+
             public void Awake()
             {
                 vehicleSeat = GetComponent<VehicleSeat>();
@@ -417,6 +423,33 @@ namespace EliteVariety.Buffs
                         Vector3 currentVelocity = new Vector3(rigidbody.velocity.x, 0f, rigidbody.velocity.z);
                         Vector3 velocityChange = Vector3.MoveTowards(currentVelocity, targetVelocity, acceleration * Time.fixedDeltaTime);
                         rigidbody.AddForce(velocityChange - currentVelocity, ForceMode.VelocityChange);
+
+                        // ai tweaks
+                        if (aiControlled)
+                        {
+                            bool cancel = false;
+
+                            // if we pass the target position, cancel the dash so that we don't go too far from the enemy
+                            float distanceToTargetPosition = Vector3.Distance(aiTargetPosition, transform.position);
+                            if (distanceToTargetPosition < aiClosestDistance)
+                            {
+                                aiClosestDistance = distanceToTargetPosition;
+                                aiClosestPointToTarget = transform.position;
+                            }
+                            float distanceToClosestPoint = Vector3.Distance(transform.position, aiClosestPointToTarget);
+                            if (distanceToClosestPoint > aiMaxDistanceUntilCancel) cancel = true;
+
+                            // don't launch self off a cliff
+                            CharacterMotor characterMotor = vehicleSeat.currentPassengerBody.characterMotor;
+                            if (characterMotor && characterMotor.isGrounded)
+                            {
+                                Vector3 estimatedNextPoint = transform.position + new Vector3(rigidbody.velocity.x, 0f, rigidbody.velocity.z) * (Time.fixedDeltaTime + 0.5f);
+                                bool groundUnderneath = Physics.Raycast(estimatedNextPoint + Vector3.up * 0.5f, Vector3.down, 30f, LayerIndex.world.mask);
+                                if (!groundUnderneath) cancel = true;
+                            }
+
+                            if (cancel) vehicleSeat.EjectPassenger(vehicleSeat.NetworkpassengerBodyObject);
+                        }
                     }
 
                     if (NetworkServer.active && selfDestructTimer <= 0)
@@ -443,6 +476,19 @@ namespace EliteVariety.Buffs
                     {
                         cameraRigController.SetOverrideCam(null, 0f);
                         cameraRigController.SetOverrideCam(this, 0.5f);
+                    }
+                }
+
+                if (!passengerBody.isPlayerControlled && passengerBody.master)
+                {
+                    RoR2.CharacterAI.BaseAI ai = passengerBody.master.aiComponents.FirstOrDefault();
+                    if (ai && ai.currentEnemy != null)
+                    {
+                        if (ai.currentEnemy.GetBullseyePosition(out Vector3 enemyPosition))
+                        {
+                            aiControlled = true;
+                            aiTargetPosition = enemyPosition;
+                        }
                     }
                 }
             }
