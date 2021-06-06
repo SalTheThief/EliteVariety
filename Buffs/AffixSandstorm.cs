@@ -114,6 +114,7 @@ namespace EliteVariety.Buffs
                     sandstormObject.GetComponent<TeamFilter>().teamIndex = TeamComponent.GetObjectTeam(gameObject);
                     sandstormObject.GetComponent<NetworkedBodyAttachment>().AttachToGameObjectAndSpawn(body.gameObject);
                 }
+                if (body && body.healthComponent && !body.healthComponent.alive) Object.Destroy(this);
             }
 
             public void OnDisable()
