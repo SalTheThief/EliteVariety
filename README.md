@@ -1,17 +1,17 @@
 # Elite Variety
-Adds 5 new elite types! Supports [Aspect Abilities](https://thunderstore.io/package/TheMysticSword/AspectAbilities/)  
+Adds 5 new elite types! Supports [Aspect Abilities](https://thunderstore.io/package/TheMysticSword/AspectAbilities/) for on-use effects.  
 
 ---
-###### Ironclad - spawns with full barrier that decays at a much lower rate. Roots on hit. On use: gain temporary armor.
+###### Ironclad - spawns with full barrier that doesn't decay. Roots on hit. On use: gain temporary armor.
 
 ---
-###### Invigorating - carries a Warbanner. Activates War Horn for all allies in the banner radius on hit. On use: increase banner radius.
+###### Invigorating - carries a warbanner that buffs nearby allies. Temporarily changes Warbanner buff to Frenzy on hit. On use: increase banner radius.
 
 ---
-###### Pillaging - steals gold from nearby allies, preventing it from being dropped on death. Steals gold from the victim on hit. On use: purchase a random item for $25 (price scales over time).
+###### Pillaging - steals gold from nearby allies. Steals gold from the victim on hit. On use: spend half of your gold and gain a random item. The more gold spent, the higher chance of getting a rarer item.
 
 ---
-###### Arenaceous - always surrounded by a sandstorm that deals damage to nearby enemies and lifts them. Reduces visibility on hit. On use: perform a tornado dash, increasing sandstorm damage.
+###### Arenaceous - always surrounded by a sandstorm that deals damage to nearby enemies. Reduces visibility on hit. On use: dash forward, knocking nearby enemies up.
 
 ---
-###### Tinkering - spawns with a Gunner Drone. Fires missiles on hit. On use: repair all drones.
+###### Tinkering - spawns with a Tinkerer's Drone that becomes stronger with the amount of Item Scrap in the inventory. Chance to steal one of the target's items and convert it into Scrap Metal on hit (stolen items are returned on death). On use: heal all ally drones.
