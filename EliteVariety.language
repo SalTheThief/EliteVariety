@@ -23,12 +23,23 @@
     "ELITE_MODIFIER_ELITEVARIETY_SANDSTORM": "Arenaceous {0}",
     "ELITE_MODIFIER_ELITEVARIETY_TINKERER": "Tinkering {0}",
 
+    //[CHARACTER BODIES]
+    "ELITEVARIETY_TINKERERDRONE_BODY_NAME": "Tinkerer's Drone",
+    "ELITEVARIETY_TINKERERDRONE_BODY_SUBTITLE": "Rewired",
+    "ELITEVARIETY_TINKERERDRONE_BODY_LORE": "<style=cMono>\r\nREPLAYING DRONE VIDEO FOOTAGE<\/style>\r\n\r\n\"Hans! We lost Lynn! We need to get out of here!\"\r\n\r\n\"Where are our drones? Hans? Wait, where are my fuel cells? Where's the shield generator?! Hans?!\"\r\n\r\n\"HANS! Are you sleeping?! Wake up! We're leaving! HANS!\"\r\n\r\n[ACCESS GRANTED. OPENING THE DOOR]\r\n\r\n\"Oh... no...\"\r\n\r\n\"They got you too...\"\r\n\r\n\r\n\r\n\"... blood... metal scraps... torn wires... scales... lemurian scales... uh-huh...\"\r\n\r\n\"Initiate voice recording.\"\r\n\r\n\"Day number 34. The planet has taken the lives of the last of my friends. Lynn and I got ambushed by a group of beetle guards. She did not escape. Hans was murdered by a lemurian that supposedly stole all of our machinery. But for what purpose? Hmm. I suppose the metal plating can be used as armor-\"\r\n\r\n\"I AM UNDER ATTACK A DRONE THAT'S OUR DRONE CEASE FIRE CEASE FIRE IT'S ATTACKING ME I CAN'T RUN IT'S NOT LISTENING I CAN'T MOVE IT'S NOT OUR DRONE I CAN'T-\"\r\n\r\n<style=cMono>VIDEO PAUSED. CONTINUE? Y/N\r\n_<\/style>",
+
+    //[UNLOCKABLES]
+    "UNLOCKABLE_LOG_ELITEVARIETY_TINKERERDRONE": "Monster Log: Tinkerer's Drone",
+
     //[ASPECT ABILITIES]
     "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXARMORED_PICKUP": "Gain temporary armor increase on use.",
     "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXBUFFING_PICKUP": "Increase banner radius on use.",
-    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXPILLAGING_PICKUP": "Purchase 5 stacks of a random item for ELITEVARIETY_PILLAGING_COST on use.",
-    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXSANDSTORM_PICKUP": "Dash on use. Sandstorm damage increased during the dash.",
-    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXTINKERER_PICKUP": "Repair all drones on use."
+    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXPILLAGING_PICKUP": "On use, spend half of your gold to gain a random item. The more gold spent, the higher chance of getting a rarer item.",
+    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXSANDSTORM_PICKUP": "Dash on use, knocking nearby enemies up.",
+    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXTINKERER_PICKUP": "Heal drones on use.",
+
+    //[CUSTOM]
+    "ELITEVARIETY_SANDSTORM_VEHICLE_EXIT_CONTEXT": "Cancel dash"
   },
   "RU": {
     //[EQUIPMENT]
@@ -54,11 +65,22 @@
     "ELITE_MODIFIER_ELITEVARIETY_SANDSTORM": "Песчан. {0}",
     "ELITE_MODIFIER_ELITEVARIETY_TINKERER": "Ремонтирующ. {0}",
 
+    //[CHARACTER BODIES]
+    "ELITEVARIETY_TINKERERDRONE_BODY_NAME": "Дрон ремонтника",
+    "ELITEVARIETY_TINKERERDRONE_BODY_SUBTITLE": "Перепрограммированный",
+    "ELITEVARIETY_TINKERERDRONE_BODY_LORE": "<style=cMono>\r\nВОСПРОИЗВЕДЕНИЕ ВИДЕОМАТЕРИАЛА С ДРОНА<\/style>\r\n\r\n\"Ханс! Мы потеряли Линн! Нам нужно убираться отсюда!\"\r\n\r\n\"Где наши дроны? Ханс? Погоди, где мои топливные батареи? Где генератор щита?! Ханс?!\"\r\n\r\n\"ХАНС! Ты там что, уснул?! Просыпайся! Мы уходим! ХАНС!\"\r\n\r\n[ДОСТУП РАЗРЕШЁН. ОТКРЫВАЮ ДВЕРИ]\r\n\r\n\"О... нет...\"\r\n\r\n\"Они и тебя прикончили...\"\r\n\r\n\r\n\r\n\"... кровь... металлолом... порванные провода... чешуя... чешуя лемурианца... а-га...\"\r\n\r\n\"Начать голосовую запись.\"\r\n\r\n\"День номер 34. Планета забрала жизни последних из моих друзей. Группа жуков-стражников устроила нам с Линн засаду. Она не смогла сбежать. Ханс был убит лемурианцем, который, по-видимому, ещё и украл всё наше оборудование. Но с какой целью? Хмм. Ну, думаю, металлическое покрытие можно использовать как броню-\"\r\n\r\n\"МЕНЯ АТАКУЮТ ДРОН ЭТО НАШ ДРОН ПРЕКРАТИТЬ ОГОНЬ ПРЕКРАТИТЬ ОГОНЬ ОН АТАКУЕТ МЕНЯ Я НЕ МОГУ БЕЖАТЬ ОН НЕ СЛУШАЕТСЯ Я НЕ МОГУ ДВИГАТЬСЯ ЭТО НЕ НАШ ДРОН Я НЕ МОГУ-\"\r\n\r\n<style=cMono>ВИДЕО ПРИОСТАНОВЛЕНО. ПРОДОЛЖИТЬ? Y/N\r\n_<\/style>",
+
+    //[UNLOCKABLES]
+    "UNLOCKABLE_LOG_ELITEVARIETY_TINKERERDRONE": "Запись о монстре: дрон ремонтника",
+
     //[ASPECT ABILITIES]
     "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXARMORED_PICKUP": "Получите временное повышение брони при использовании.",
     "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXBUFFING_PICKUP": "Увеличивает радиус стяга при использовании.",
-    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXPILLAGING_PICKUP": "При использовании покупает 5 шт. случайного предмета за ELITEVARIETY_PILLAGING_COST.",
-    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXSANDSTORM_PICKUP": "Совершите рывок при использовании. Урон от бури увеличен во время рывка.",
-    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXTINKERER_PICKUP": "Чинит всех дронов при использовании."
+    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXPILLAGING_PICKUP": "При использовании потратьте половину золота и получите случайный предмет. Чем больше золота потрачено, тем выше шанс получить более редкий предмет.",
+    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXSANDSTORM_PICKUP": "При использовании совершает рывок, подбрасывая близжайших врагов.",
+    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXTINKERER_PICKUP": "Лечит дронов при использовании.",
+
+    //[CUSTOM]
+    "ELITEVARIETY_SANDSTORM_VEHICLE_EXIT_CONTEXT": "Прекратить рывок"
   }
 }
