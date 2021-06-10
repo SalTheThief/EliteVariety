@@ -65,8 +65,11 @@ namespace EliteVariety
             }
 
             MysticsRisky2Utils.ContentManagement.ContentLoadHelper.PluginAwakeLoad<Buffs.BaseBuff>(executingAssembly);
+            MysticsRisky2Utils.ContentManagement.ContentLoadHelper.PluginAwakeLoad<Items.BaseItem>(executingAssembly);
             MysticsRisky2Utils.ContentManagement.ContentLoadHelper.PluginAwakeLoad<Equipment.BaseEquipment>(executingAssembly);
             MysticsRisky2Utils.ContentManagement.ContentLoadHelper.PluginAwakeLoad<Elites.BaseElite>(executingAssembly);
+            MysticsRisky2Utils.ContentManagement.ContentLoadHelper.PluginAwakeLoad<CharacterBodies.BaseCharacterBody>(executingAssembly);
+            MysticsRisky2Utils.ContentManagement.ContentLoadHelper.PluginAwakeLoad<CharacterMasters.BaseCharacterMaster>(executingAssembly);
 
             ContentManager.collectContentPackProviders += (addContentPackProvider) =>
             {
@@ -110,6 +113,10 @@ namespace EliteVariety
             {
                 () =>
                 {
+                    contentLoadHelper.DispatchLoad<ItemDef>(Main.executingAssembly, typeof(EliteVariety.Items.BaseItem), x => contentPack.itemDefs.Add(x));
+                },
+                () =>
+                {
                     contentLoadHelper.DispatchLoad<EquipmentDef>(Main.executingAssembly, typeof(EliteVariety.Equipment.BaseEquipment), x => contentPack.equipmentDefs.Add(x));
                 },
                 () =>
@@ -119,6 +126,14 @@ namespace EliteVariety
                 () =>
                 {
                     contentLoadHelper.DispatchLoad<EliteDef>(Main.executingAssembly, typeof(EliteVariety.Elites.BaseElite), x => contentPack.eliteDefs.Add(x));
+                },
+                () =>
+                {
+                    contentLoadHelper.DispatchLoad<GameObject>(Main.executingAssembly, typeof(EliteVariety.CharacterBodies.BaseCharacterBody), x => contentPack.bodyPrefabs.Add(x));
+                },
+                () =>
+                {
+                    contentLoadHelper.DispatchLoad<GameObject>(Main.executingAssembly, typeof(EliteVariety.CharacterMasters.BaseCharacterMaster), x => contentPack.masterPrefabs.Add(x));
                 }
             };
             int num;
@@ -136,6 +151,11 @@ namespace EliteVariety
             }
             loadDispatchers = new System.Action[]
             {
+                () =>
+                {
+                    ContentLoadHelper.PopulateTypeFields<ItemDef>(typeof(Items), contentPack.itemDefs);
+                    MysticsRisky2Utils.ContentManagement.ContentLoadHelper.AddPrefixToAssets<ItemDef>(contentPack.itemDefs, Main.TokenPrefix);
+                },
                 () =>
                 {
                     ContentLoadHelper.PopulateTypeFields<EquipmentDef>(typeof(Equipment), contentPack.equipmentDefs);
@@ -161,6 +181,7 @@ namespace EliteVariety
                     contentPack.unlockableDefs.Add(Resources.unlockableDefs.ToArray());
                     contentPack.entityStateTypes.Add(Resources.entityStateTypes.ToArray());
                     contentPack.skillDefs.Add(Resources.skillDefs.ToArray());
+                    contentPack.skillFamilies.Add(Resources.skillFamilies.ToArray());
                 }
             };
             for (int i = 0; i < loadDispatchers.Length; i = num)
@@ -171,8 +192,11 @@ namespace EliteVariety
                 num = i + 1;
             }
             MysticsRisky2Utils.ContentManagement.ContentLoadHelper.InvokeAfterContentPackLoaded<EliteVariety.Buffs.BaseBuff>(Main.executingAssembly);
+            MysticsRisky2Utils.ContentManagement.ContentLoadHelper.InvokeAfterContentPackLoaded<EliteVariety.Items.BaseItem>(Main.executingAssembly);
             MysticsRisky2Utils.ContentManagement.ContentLoadHelper.InvokeAfterContentPackLoaded<EliteVariety.Equipment.BaseEquipment>(Main.executingAssembly);
             MysticsRisky2Utils.ContentManagement.ContentLoadHelper.InvokeAfterContentPackLoaded<EliteVariety.Elites.BaseElite>(Main.executingAssembly);
+            MysticsRisky2Utils.ContentManagement.ContentLoadHelper.InvokeAfterContentPackLoaded<EliteVariety.CharacterBodies.BaseCharacterBody>(Main.executingAssembly);
+            MysticsRisky2Utils.ContentManagement.ContentLoadHelper.InvokeAfterContentPackLoaded<EliteVariety.CharacterMasters.BaseCharacterMaster>(Main.executingAssembly);
             loadDispatchers = null;
             yield break;
         }
@@ -202,6 +226,12 @@ namespace EliteVariety
             public static List<UnlockableDef> unlockableDefs = new List<UnlockableDef>();
             public static List<System.Type> entityStateTypes = new List<System.Type>();
             public static List<RoR2.Skills.SkillDef> skillDefs = new List<RoR2.Skills.SkillDef>();
+            public static List<RoR2.Skills.SkillFamily> skillFamilies = new List<RoR2.Skills.SkillFamily>();
+        }
+
+        public static class Items
+        {
+            public static ItemDef TinkererDroneStatBonus;
         }
 
         public static class Equipment
@@ -210,6 +240,7 @@ namespace EliteVariety
             public static EquipmentDef AffixBuffing;
             public static EquipmentDef AffixPillaging;
             public static EquipmentDef AffixSandstorm;
+            public static EquipmentDef AffixTinkerer;
         }
 
         public static class Buffs
@@ -218,6 +249,7 @@ namespace EliteVariety
             public static BuffDef AffixBuffing;
             public static BuffDef AffixPillaging;
             public static BuffDef AffixSandstorm;
+            public static BuffDef AffixTinkerer;
             public static BuffDef ArmoredHeavyStun;
             public static BuffDef ArmoredSelfBuff;
             public static BuffDef SandstormBlind;
@@ -229,6 +261,7 @@ namespace EliteVariety
             public static EliteDef Buffing;
             public static EliteDef Pillaging;
             public static EliteDef Sandstorm;
+            public static EliteDef Tinkerer;
         }
     }
 }
