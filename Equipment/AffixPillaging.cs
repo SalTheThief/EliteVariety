@@ -147,8 +147,8 @@ namespace EliteVariety.Equipment
                                     WeightedSelection<List<PickupIndex>> weightedSelection = new WeightedSelection<List<PickupIndex>>(3);
                                     int costScale = EliteVarietyAffixPillagingNetworkedCost.instance.cost;
                                     weightedSelection.AddChoice(Run.instance.availableTier1DropList, 80f);
-                                    weightedSelection.AddChoice(Run.instance.availableTier2DropList, 20f * (1f + goldToSpend / (400u / costScale)));
-                                    weightedSelection.AddChoice(Run.instance.availableTier3DropList, 1f * (1f + goldToSpend / (100u / costScale)));
+                                    weightedSelection.AddChoice(Run.instance.availableTier2DropList, 20f * (goldToSpend / (200u / costScale)));
+                                    weightedSelection.AddChoice(Run.instance.availableTier3DropList, 1f * (goldToSpend / (50u / costScale)));
 
                                     costTypeDef.PayCost((int)goldToSpend, interactor, equipmentSlot.gameObject, RoR2Application.rng, ItemIndex.None);
 
