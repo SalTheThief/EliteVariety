@@ -173,8 +173,8 @@ namespace EliteVariety.Buffs
 				EliteVarietyAffixPillagingBehavior component = damageReport.attackerBody.GetComponent<EliteVarietyAffixPillagingBehavior>();
 				if (component)
 				{
-					uint stealAmount = (uint)Mathf.Max(damageReport.damageDealt / damageReport.victimBody.healthComponent.fullCombinedHealth * damageReport.victimMaster.money, 1u);
-					bool stolen = component.StealGold(damageReport.victimBody, stealAmount, false, true);
+					uint stealAmount = (uint)Mathf.Max(10u * Run.instance.difficultyCoefficient * damageReport.damageInfo.procCoefficient, 1u);
+					bool stolen = component.StealGold(damageReport.victimBody, stealAmount, true, true);
 					if (stolen)
 					{
 						EffectManager.SimpleImpactEffect(Resources.Load<GameObject>("Prefabs/Effects/ImpactEffects/CoinImpact"), damageReport.victimBody.corePosition, Vector3.up, true);
