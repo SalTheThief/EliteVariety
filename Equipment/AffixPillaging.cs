@@ -20,7 +20,7 @@ namespace EliteVariety.Equipment
         {
             base.PreLoad();
             equipmentDef.name = "AffixPillaging";
-            equipmentDef.cooldown = 90f;
+            equipmentDef.cooldown = 45f;
         }
 
         public override void OnLoad()
