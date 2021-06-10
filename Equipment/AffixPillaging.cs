@@ -132,14 +132,14 @@ namespace EliteVariety.Equipment
                 equipmentDef = equipmentDef,
                 onUseOverride = (equipmentSlot) =>
                 {
-                    if (EliteVarietyAffixPillagingNetworkedCost.instance && equipmentSlot.characterBody.master)
+                    if (EliteVarietyAffixPillagingNetworkedCost.instance && equipmentSlot.characterBody.master && equipmentSlot.characterBody.master.money > 0)
                     {
                         CostTypeDef costTypeDef = CostTypeCatalog.GetCostTypeDef(CostTypeIndex.Money);
                         if (costTypeDef != null)
                         {
                             Interactor interactor = equipmentSlot.characterBody.GetComponent<Interactor>();
                             if (interactor) {
-                                uint goldToSpend = (uint)(equipmentSlot.characterBody.master.money * 0.5f);
+                                uint goldToSpend = (uint)Mathf.Max(equipmentSlot.characterBody.master.money * 0.5f, 1u);
                                 if (goldToSpend > 0)
                                 {
                                     Dictionary<ItemIndex, int> itemsToGive = new Dictionary<ItemIndex, int>();
