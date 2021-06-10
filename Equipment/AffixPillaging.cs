@@ -13,9 +13,6 @@ namespace EliteVariety.Equipment
     public class AffixPillaging : BaseEliteAffix
     {
         public static GameObject networkedCostPrefab;
-        public static int baseCost = 50;
-        public static CostTypeIndex costType = CostTypeIndex.Money;
-        public static int itemCount = 5;
         public static GameObject itemAcquiredOrbEffect;
         public static GameObject onUseEffect;
 
@@ -95,8 +92,6 @@ namespace EliteVariety.Equipment
 
             if (Main.aspectAbilitiesEnabled) AspectAbilitiesSupport();
 
-            On.RoR2.Language.GetLocalizedStringByToken += Language_GetLocalizedStringByToken;
-
             networkedCostPrefab = Utils.CreateBlankPrefab(Main.TokenPrefix + "AffixPillagingNetworkedCost");
             networkedCostPrefab.AddComponent<EliteVarietyAffixPillagingNetworkedCost>();
 
@@ -135,44 +130,54 @@ namespace EliteVariety.Equipment
             AspectAbilities.AspectAbilitiesPlugin.RegisterAspectAbility(new AspectAbilities.AspectAbility
             {
                 equipmentDef = equipmentDef,
-                aiMaxUseDistance = Mathf.Infinity,
-                aiHealthFractionToUseChance = new AnimationCurve
-                {
-                    keys = new Keyframe[]
-                    {
-                        new Keyframe(0f, 1f),
-                        new Keyframe(1f, 1f)
-                    }
-                },
                 onUseOverride = (equipmentSlot) =>
                 {
-                    if (EliteVarietyAffixPillagingNetworkedCost.instance)
+                    if (EliteVarietyAffixPillagingNetworkedCost.instance && equipmentSlot.characterBody.master)
                     {
-                        CostTypeDef costTypeDef = CostTypeCatalog.GetCostTypeDef(costType);
+                        CostTypeDef costTypeDef = CostTypeCatalog.GetCostTypeDef(CostTypeIndex.Money);
                         if (costTypeDef != null)
                         {
                             Interactor interactor = equipmentSlot.characterBody.GetComponent<Interactor>();
                             if (interactor) {
-                                if (costTypeDef.IsAffordable(EliteVarietyAffixPillagingNetworkedCost.instance.cost, interactor))
+                                uint goldToSpend = (uint)(equipmentSlot.characterBody.master.money * 0.5f);
+                                if (goldToSpend > 0)
                                 {
-                                    costTypeDef.PayCost(EliteVarietyAffixPillagingNetworkedCost.instance.cost, interactor, equipmentSlot.gameObject, RoR2Application.rng, ItemIndex.None);
+                                    Dictionary<ItemIndex, int> itemsToGive = new Dictionary<ItemIndex, int>();
+                                    
+                                    WeightedSelection<List<PickupIndex>> weightedSelection = new WeightedSelection<List<PickupIndex>>(3);
+                                    int costScale = EliteVarietyAffixPillagingNetworkedCost.instance.cost;
+                                    weightedSelection.AddChoice(Run.instance.availableTier1DropList, 80f);
+                                    weightedSelection.AddChoice(Run.instance.availableTier1DropList, 20f * (1f + goldToSpend / (400u / costScale)));
+                                    weightedSelection.AddChoice(Run.instance.availableTier1DropList, 1f * (1f + goldToSpend / (100u / costScale)));
 
-                                    PickupIndex pickupIndex = RoR2Application.rng.NextElementUniform(Run.instance.availableTier1DropList);
-                                    ItemIndex itemIndex = PickupCatalog.GetPickupDef(pickupIndex).itemIndex;
+                                    costTypeDef.PayCost((int)goldToSpend, interactor, equipmentSlot.gameObject, RoR2Application.rng, ItemIndex.None);
 
-                                    equipmentSlot.inventory.GiveItem(itemIndex, itemCount);
-
-                                    EffectData effectData = new EffectData
+                                    int itemsToGet = 1;
+                                    for (var i = 0; i < itemsToGet; i++)
                                     {
-                                        origin = equipmentSlot.characterBody.corePosition,
-                                        genericFloat = 4f,
-                                        genericUInt = (uint)(itemIndex + 1)
-                                    };
-                                    effectData.SetNetworkedObjectReference(equipmentSlot.characterBody.gameObject);
-                                    EffectManager.SpawnEffect(itemAcquiredOrbEffect, effectData, true);
+                                        PickupIndex pickupIndex = RoR2Application.rng.NextElementUniform(weightedSelection.Evaluate(RoR2Application.rng.nextNormalizedFloat));
+                                        ItemIndex itemIndex = PickupCatalog.GetPickupDef(pickupIndex).itemIndex;
+
+                                        if (!itemsToGive.ContainsKey(itemIndex)) itemsToGive.Add(itemIndex, 0);
+                                        itemsToGive[itemIndex]++;
+                                    }
+
+                                    foreach (KeyValuePair<ItemIndex, int> keyValuePair in itemsToGive)
+                                    {
+                                        equipmentSlot.inventory.GiveItem(keyValuePair.Key, keyValuePair.Value);
+
+                                        EffectData effectData = new EffectData
+                                        {
+                                            origin = equipmentSlot.characterBody.corePosition,
+                                            genericFloat = 2f,
+                                            genericUInt = (uint)(keyValuePair.Key + 1)
+                                        };
+                                        effectData.SetNetworkedObjectReference(equipmentSlot.characterBody.gameObject);
+                                        EffectManager.SpawnEffect(itemAcquiredOrbEffect, effectData, true);
+                                    }
 
                                     EffectManager.SimpleEffect(onUseEffect, equipmentSlot.characterBody.corePosition, Quaternion.identity, true);
-
+                                    
                                     return true;
                                 }
                             }
@@ -196,7 +201,7 @@ namespace EliteVariety.Equipment
                 {
                     if (Run.instance)
                     {
-                        cost = Run.instance.GetDifficultyScaledCost(baseCost);
+                        cost = Run.instance.GetDifficultyScaledCost(1);
                         new SyncScaling(cost).Send(NetworkDestination.Clients);
                     }
                 }
@@ -236,35 +241,6 @@ namespace EliteVariety.Equipment
                     writer.Write(cost);
                 }
             }
-        }
-
-        private static string Language_GetLocalizedStringByToken(On.RoR2.Language.orig_GetLocalizedStringByToken orig, Language self, string token)
-        {
-            string localizedString = orig(self, token);
-
-            string chestCostReplacementToken = "ELITEVARIETY_PILLAGING_COST";
-            if (localizedString.Contains(chestCostReplacementToken))
-            {
-                string costString = "";
-                int cost = baseCost;
-                if (EliteVarietyAffixPillagingNetworkedCost.instance) cost = EliteVarietyAffixPillagingNetworkedCost.instance.cost;
-
-                CostTypeDef costTypeDef = CostTypeCatalog.GetCostTypeDef(costType);
-                if (costTypeDef != null)
-                {
-                    Main.sharedStringBuilder.Clear();
-                    costTypeDef.BuildCostStringStyled(cost, Main.sharedStringBuilder, true, false);
-                    costString = string.Format(
-                        "<color=#{1}>{0}</color>",
-                        Main.sharedStringBuilder.ToString(),
-                        ColorUtility.ToHtmlStringRGB(costTypeDef.GetCostColor(false))
-                    );
-                }
-
-                localizedString = localizedString.Replace(chestCostReplacementToken, costString);
-            }
-
-            return localizedString;
         }
 
         private void SceneDirector_PopulateScene(On.RoR2.SceneDirector.orig_PopulateScene orig, SceneDirector self)
