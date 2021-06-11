@@ -413,7 +413,7 @@ namespace EliteVariety.CharacterBodies
             public static GameObject muzzleFlashPrefab;
             public static GameObject tracerEffectPrefab;
             public static GameObject hitEffectPrefab;
-            public static float damageCoefficient = 3f;
+            public static float damageCoefficient = 2f;
             public static float force = 2000f;
             public static float laserRadius = 0.7f;
             public static float procCoefficient = 1f;
