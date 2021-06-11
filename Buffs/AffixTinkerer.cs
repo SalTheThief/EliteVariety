@@ -273,6 +273,7 @@ namespace EliteVariety.Buffs
                             scrap = RoR2Content.Items.ScrapRed;
                             break;
                     }
+                    ItemIndex scrapIndex = scrap.itemIndex;
 
                     if (!stealDictionary.ContainsKey(inventory)) stealDictionary.Add(inventory, new List<StolenItemInfo>());
                     StolenItemInfo stolenItemInfo = stealDictionary[inventory].FirstOrDefault(x => x.itemIndex == itemToSteal);
@@ -291,6 +292,18 @@ namespace EliteVariety.Buffs
                     {
                         body.inventory.GiveItem(scrap, stealAmount);
                         orbsInFlight.Remove(orb);
+
+                        foreach (CharacterMaster droneMaster in droneMasters)
+                        {
+                            CharacterBody droneBody = droneMaster.GetBody();
+                            if (droneBody)
+                            {
+                                ItemTransferOrb item2 = ItemTransferOrb.DispatchItemTransferOrb(body.corePosition, null, scrapIndex, stealAmount, (orb2) =>
+                                {
+                                    orbsInFlight.Remove(orb2);
+                                }, droneBody.networkIdentity);
+                            }
+                        }
                     }, body.networkIdentity);
                     orbsInFlight.Add(item);
                 }
