@@ -82,7 +82,7 @@ namespace EliteVariety.Buffs
 		public void CharacterBody_OnInventoryChanged(On.RoR2.CharacterBody.orig_OnInventoryChanged orig, CharacterBody self)
         {
             orig(self);
-            if (NetworkServer.active) self.AddItemBehavior<EliteVarietyAffixPillagingBehavior>(self.HasBuff(buffDef) ? 1 : 0);
+            if (NetworkServer.active) self.AddItemBehavior<EliteVarietyAffixPillagingBehavior>(self.HasBuff(buffDef) && self.healthComponent.alive ? 1 : 0);
         }
 
         public class EliteVarietyAffixPillagingBehavior : CharacterBody.ItemBehavior
@@ -102,6 +102,11 @@ namespace EliteVariety.Buffs
 
             public void FixedUpdate()
             {
+				if (!body.healthComponent.alive)
+                {
+					Object.Destroy(this);
+					return;
+                }
                 allyGoldStealStopwatch += Time.fixedDeltaTime;
                 if (allyGoldStealStopwatch >= allyGoldStealInterval)
                 {
