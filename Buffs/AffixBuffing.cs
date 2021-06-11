@@ -169,6 +169,7 @@ namespace EliteVariety.Buffs
             public float extraRadius = 15f;
             public float extraRadiusDuration = 0f;
             public bool extraRadiusActive = false;
+            public bool deathRadiusShrunk = false;
             public float effectDelayTimer = 0f;
             public EliteVarietyAffixBuffingAura auraComponent;
 
@@ -194,13 +195,28 @@ namespace EliteVariety.Buffs
                         auraComponent.SpecialWardToggle(flag);
                     }
 
-                    flag = extraRadiusDuration > 0;
-                    if (flag != extraRadiusActive)
+                    if (body.healthComponent.alive)
                     {
-                        extraRadiusActive = flag;
-                        foreach (BuffWard buffWard in buffAura.GetComponents<BuffWard>())
+                        flag = extraRadiusDuration > 0;
+                        if (flag != extraRadiusActive)
                         {
-                            buffWard.Networkradius = baseRadius + body.radius + (flag ? extraRadius : 0f);
+                            extraRadiusActive = flag;
+                            deathRadiusShrunk = false;
+                            foreach (BuffWard buffWard in buffAura.GetComponents<BuffWard>())
+                            {
+                                buffWard.Networkradius = baseRadius + body.radius + (flag ? extraRadius : 0f);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (body.healthComponent.alive != deathRadiusShrunk)
+                        {
+                            deathRadiusShrunk = body.healthComponent.alive;
+                            foreach (BuffWard buffWard in buffAura.GetComponents<BuffWard>())
+                            {
+                                buffWard.Networkradius = 0f;
+                            }
                         }
                     }
                 }
