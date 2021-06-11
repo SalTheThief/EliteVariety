@@ -87,10 +87,10 @@ namespace EliteVariety.Buffs
 
         public class EliteVarietyAffixPillagingBehavior : CharacterBody.ItemBehavior
         {
-            public float allyGoldStealRadius = 25f;
+            public float allyGoldStealRadius = 15f;
             public float allyGoldStealInterval = 5f;
             public float allyGoldStealStopwatch = 0f;
-            public uint allyGoldStealBaseAmount = 1u;
+            public uint allyGoldStealBaseAmount = 2u;
             public int allyGoldStealMaxAllies = 5;
 			public EliteVarietyAffixPillagingDeathRewardsModifier deathRewardsModifier;
 
