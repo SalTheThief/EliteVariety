@@ -54,12 +54,13 @@ namespace EliteVariety.CharacterMasters
             softLeashAttack.customName = "SoftLeashAttack";
             softLeashAttack.skillSlot = SkillSlot.Primary;
             softLeashAttack.minDistance = 20f;
+            softLeashAttack.maxDistance = 60f;
             softLeashAttack.moveTargetType = AISkillDriver.TargetType.CurrentLeader;
             softLeashAttack.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
             softLeashAttack.moveInputScale = 1f;
             softLeashAttack.aimType = AISkillDriver.AimType.AtCurrentEnemy;
             softLeashAttack.buttonPressType = AISkillDriver.ButtonPressType.Hold;
-            softLeashAttack.movementType = AISkillDriver.MovementType.Stop;
+            softLeashAttack.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
             softLeashAttack.driverUpdateTimerOverride = 1f;
             softLeashAttack.resetCurrentEnemyOnNextDriverSelection = true;
 
