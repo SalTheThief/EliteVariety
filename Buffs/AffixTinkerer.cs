@@ -235,6 +235,11 @@ namespace EliteVariety.Buffs
                         }
                     }
                 }
+
+                foreach (CharacterMaster droneMaster in droneMasters)
+                {
+                    droneMaster.TrueKill();
+                }
             }
 
             public void StealFrom(Inventory inventory, Vector3 emitPosition, NetworkIdentity networkIdentity)
