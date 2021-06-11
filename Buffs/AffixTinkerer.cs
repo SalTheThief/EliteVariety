@@ -52,10 +52,20 @@ namespace EliteVariety.Buffs
 
         public class EliteVarietyAffixTinkererBehavior : CharacterBody.ItemBehavior
         {
-            public CharacterMaster droneMaster;
+            private List<CharacterMaster> _droneMasters;
+            public List<CharacterMaster> droneMasters {
+                get
+                {
+                    _droneMasters.RemoveAll(x => !x);
+                    return _droneMasters;
+                }
+                set
+                {
+                    _droneMasters = value;
+                }
+            }
             public DeployableMinionSpawner droneSpawner;
             public int droneStatBonus = 0;
-            public EliteVarietyAffixTinkererRecipientBehavior recipientBehavior;
             public Dictionary<Inventory, List<StolenItemInfo>> stealDictionary;
             public List<ItemTransferOrb> orbsInFlight;
 
@@ -70,6 +80,7 @@ namespace EliteVariety.Buffs
             {
                 stealDictionary = new Dictionary<Inventory, List<StolenItemInfo>>();
                 orbsInFlight = new List<ItemTransferOrb>();
+                droneMasters = new List<CharacterMaster>();
             }
 
             public void FixedUpdate()
@@ -92,38 +103,42 @@ namespace EliteVariety.Buffs
             {
                 int oldDroneStatBonus = droneStatBonus;
                 droneStatBonus = 0;
-                if (droneMaster)
+                Inventory myInventory = body.inventory;
+                if (myInventory)
                 {
-                    Inventory myInventory = body.inventory;
-                    if (myInventory)
+                    foreach (ItemIndex itemIndex in ItemCatalog.allItems)
                     {
-                        foreach (ItemIndex itemIndex in ItemCatalog.allItems)
+                        ItemDef itemDef = ItemCatalog.GetItemDef(itemIndex);
+                        if (itemDef.ContainsTag(ItemTag.Scrap))
                         {
-                            ItemDef itemDef = ItemCatalog.GetItemDef(itemIndex);
-                            if (itemDef.ContainsTag(ItemTag.Scrap))
+                            int scrapPower = 0;
+                            switch (itemDef.tier)
                             {
-                                int scrapPower = 0;
-                                switch (itemDef.tier)
-                                {
-                                    case ItemTier.Tier1:
-                                        scrapPower = 1;
-                                        break;
-                                    case ItemTier.Tier2:
-                                    case ItemTier.Boss:
-                                        scrapPower = 2;
-                                        break;
-                                    case ItemTier.Tier3:
-                                        scrapPower = 3;
-                                        break;
-                                }
-                                if (scrapPower != 0) droneStatBonus += myInventory.GetItemCount(itemDef) * scrapPower;
+                                case ItemTier.Tier1:
+                                    scrapPower = 1;
+                                    break;
+                                case ItemTier.Tier2:
+                                case ItemTier.Boss:
+                                    scrapPower = 2;
+                                    break;
+                                case ItemTier.Tier3:
+                                    scrapPower = 3;
+                                    break;
                             }
+                            if (scrapPower != 0) droneStatBonus += myInventory.GetItemCount(itemDef) * scrapPower;
                         }
                     }
                 }
-                if (oldDroneStatBonus != droneStatBonus && recipientBehavior)
+                if (oldDroneStatBonus != droneStatBonus)
                 {
-                    recipientBehavior.droneStatBonus = droneStatBonus;
+                    foreach (CharacterMaster droneMaster in droneMasters)
+                    {
+                        EliteVarietyAffixTinkererRecipientBehavior component = droneMaster.GetComponent<EliteVarietyAffixTinkererRecipientBehavior>();
+                        if (component)
+                        {
+                            component.droneStatBonus = droneStatBonus;
+                        }
+                    }
                 }
             }
 
@@ -132,11 +147,11 @@ namespace EliteVariety.Buffs
                 GameObject spawnedInstance = obj.spawnedInstance;
                 if (spawnedInstance)
                 {
-                    droneMaster = spawnedInstance.GetComponent<CharacterMaster>();
+                    CharacterMaster droneMaster = spawnedInstance.GetComponent<CharacterMaster>();
+                    droneMasters.Add(droneMaster);
                     if (droneMaster && droneMaster.inventory)
                     {
                         droneMaster.inventory.GiveItem(EliteVarietyContent.Items.TinkererDroneStatBonus);
-                        recipientBehavior = droneMaster.gameObject.AddComponent<EliteVarietyAffixTinkererRecipientBehavior>();
                     }
                 }
             }
