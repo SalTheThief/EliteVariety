@@ -102,7 +102,7 @@ namespace EliteVariety.Buffs
                 bool atLeastOneTeamMemberCanSee = false;
                 foreach (TeamComponent teamMember in teamMembers)
                 {
-                    if (teamMember.body && (!teamMember.body.isPlayerControlled || LocalUserManager.localUsersList.Any(x => x.cachedBody && x.cachedBody == teamMember.body)))
+                    if (teamMember.body)
                     {
                         if (teamMember.body.HasBuff(buffDef))
                         {
