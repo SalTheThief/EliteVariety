@@ -141,7 +141,7 @@ namespace EliteVariety.Buffs
 
             public float damage = 0.1f;
             public float dashDamage = 0.2f;
-            public float procCoefficient = 0.1f;
+            public float procCoefficient = 0.25f;
             public float dashProcCoefficient = 1f;
             public Vector3 force = Vector3.zero;
             public Vector3 dashForce = Vector3.up * 1000f;
