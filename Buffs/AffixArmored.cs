@@ -77,9 +77,12 @@ namespace EliteVariety.Buffs
         {
             orig(self);
 
-            ref RoR2.UI.HealthBar.BarInfo barrierBarStyle = ref self.barInfoCollection.barrierBarInfo;
-            barrierBarStyle.color = Color.white;
-            barrierBarStyle.sprite = barrierBarSprite;
+            if (self.source && self.source.body && self.source.body.HasBuff(buffDef))
+            {
+                ref RoR2.UI.HealthBar.BarInfo barrierBarStyle = ref self.barInfoCollection.barrierBarInfo;
+                barrierBarStyle.color = Color.white;
+                barrierBarStyle.sprite = barrierBarSprite;
+            }
         }
     }
 }
