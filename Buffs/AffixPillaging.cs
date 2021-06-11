@@ -69,6 +69,7 @@ namespace EliteVariety.Buffs
 
 			EliteVarietyContent.Resources.effectPrefabs.Add(moneyTransferOrbEffect);
 
+            On.RoR2.DeathRewards.Awake += DeathRewards_Awake;
             On.RoR2.DeathRewards.OnKilledServer += DeathRewards_OnKilledServer;
 		}
 
@@ -120,7 +121,7 @@ namespace EliteVariety.Buffs
 							HealthComponent healthComponent = colliderBody.healthComponent;
 							if (healthComponent && healthComponent.alive)
 							{
-								StealGold(colliderBody, stealAmount, true, false);
+								StealGold(colliderBody, stealAmount, false);
 								alliesToStealFrom--;
 							}
 						}
@@ -128,7 +129,7 @@ namespace EliteVariety.Buffs
                 }
             }
 
-            public bool StealGold(CharacterBody victim, uint stealAmount, bool dontGainGoldIfVictimHasNone, bool keepSameDeathRewardsOnVictim)
+            public bool StealGold(CharacterBody victim, uint stealAmount, bool keepSameDeathRewardsOnVictim)
             {
 				if (!body.master) return false;
 
@@ -138,28 +139,24 @@ namespace EliteVariety.Buffs
 				{
 					if (victimMaster.money > 0)
 					{
-						uint goldToRemove = (uint)Mathf.Min(stealAmount, victimMaster.money);
-						victimMaster.money -= goldToRemove;
+						uint goldToSteal = (uint)Mathf.Min(stealAmount, victimMaster.money);
+						victimMaster.money -= goldToSteal;
 
 						EliteVarietyAffixPillagingDeathRewardsModifier victimDeathRewardsModifier = victim.GetComponent<EliteVarietyAffixPillagingDeathRewardsModifier>();
 						if (!victimDeathRewardsModifier) victimDeathRewardsModifier = victim.gameObject.AddComponent<EliteVarietyAffixPillagingDeathRewardsModifier>();
-						if (keepSameDeathRewardsOnVictim) victimDeathRewardsModifier.addGold += goldToRemove;
-                    }
-                    else
-                    {
-						if (dontGainGoldIfVictimHasNone) return false;
-                    }
+						if (keepSameDeathRewardsOnVictim) victimDeathRewardsModifier.goldStolenFromMe += goldToSteal;
 
-					MoneyTransferOrb orb = new MoneyTransferOrb();
-					orb.masterToGiveMoneyTo = body.master;
-					orb.money = stealAmount;
-					orb.origin = victim.corePosition;
-					orb.target = body.mainHurtBox;
-					OrbManager.instance.AddOrb(orb);
+						MoneyTransferOrb orb = new MoneyTransferOrb();
+						orb.masterToGiveMoneyTo = body.master;
+						orb.money = goldToSteal;
+						orb.origin = victim.corePosition;
+						orb.target = body.mainHurtBox;
+						OrbManager.instance.AddOrb(orb);
 
-					deathRewardsModifier.removeGold += stealAmount; // don't drop stolen gold on death
+						deathRewardsModifier.stolenGold += goldToSteal; // don't drop stolen gold on death
 
-					return true;
+						return true;
+					}
 				}
 
 				return false;
@@ -174,7 +171,7 @@ namespace EliteVariety.Buffs
 				if (component)
 				{
 					uint stealAmount = (uint)Mathf.Max(10u * Run.instance.difficultyCoefficient * damageReport.damageInfo.procCoefficient, 1u);
-					bool stolen = component.StealGold(damageReport.victimBody, stealAmount, true, true);
+					bool stolen = component.StealGold(damageReport.victimBody, stealAmount, true);
 					if (stolen)
 					{
 						EffectManager.SimpleImpactEffect(Resources.Load<GameObject>("Prefabs/Effects/ImpactEffects/CoinImpact"), damageReport.victimBody.corePosition, Vector3.up, true);
@@ -209,27 +206,31 @@ namespace EliteVariety.Buffs
 			}
 		}
 
+		private void DeathRewards_Awake(On.RoR2.DeathRewards.orig_Awake orig, DeathRewards self)
+		{
+			orig(self);
+			self.gameObject.AddComponent<EliteVarietyAffixPillagingDeathRewardsModifier>();
+		}
+
 		public class EliteVarietyAffixPillagingDeathRewardsModifier : MonoBehaviour
 		{
-			public uint addGold = 0;
-			public uint removeGold = 0;
-			public CharacterMaster master;
-			public uint moneyLastFrame = 0;
+			public uint stolenGold = 0;
+			public uint goldStolenFromMe = 0;
+			public uint goldRewardLastFrame = 0;
+			public DeathRewards deathRewards;
 
 			public void Awake()
             {
-				CharacterBody body = GetComponent<CharacterBody>();
-				if (body) master = body.master;
+				deathRewards = GetComponent<DeathRewards>();
             }
 
 			public void FixedUpdate()
             {
-				if (master && master.money < moneyLastFrame)
+				if (deathRewards && deathRewards.goldReward < goldRewardLastFrame)
                 {
-					removeGold -= moneyLastFrame - master.money;
-					if (removeGold < 0) removeGold = 0;
+					stolenGold -= goldRewardLastFrame - deathRewards.goldReward;
+					goldRewardLastFrame = deathRewards.goldReward;
                 }
-				moneyLastFrame = master.money;
             }
 		}
 
@@ -240,8 +241,8 @@ namespace EliteVariety.Buffs
 				EliteVarietyAffixPillagingDeathRewardsModifier deathRewardsModifier = self.GetComponent<EliteVarietyAffixPillagingDeathRewardsModifier>();
 				if (deathRewardsModifier)
 				{
-					uint goldChange = deathRewardsModifier.addGold - deathRewardsModifier.removeGold;
-					self.goldReward += (uint)(goldChange > 0 ? goldChange : -Mathf.Min(-goldChange, self.goldReward));
+					self.goldReward += deathRewardsModifier.goldStolenFromMe;
+					self.goldReward -= (uint)Mathf.Min(deathRewardsModifier.stolenGold, self.goldReward);
 				}
 			}
 			orig(self, damageReport);
