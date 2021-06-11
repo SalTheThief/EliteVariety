@@ -47,35 +47,21 @@ namespace EliteVariety.CharacterMasters
             hardLeashToLeader.moveInputScale = 1f;
             hardLeashToLeader.aimType = AISkillDriver.AimType.AtCurrentEnemy;
             hardLeashToLeader.buttonPressType = AISkillDriver.ButtonPressType.Hold;
-            hardLeashToLeader.driverUpdateTimerOverride = 3f;
             hardLeashToLeader.resetCurrentEnemyOnNextDriverSelection = true;
 
             AISkillDriver attackNearbyEnemies = prefab.AddComponent<AISkillDriver>();
             attackNearbyEnemies.customName = "AttackNearbyEnemies";
             attackNearbyEnemies.skillSlot = SkillSlot.Primary;
             attackNearbyEnemies.minDistance = 15f;
-            attackNearbyEnemies.maxDistance = 30f;
+            attackNearbyEnemies.maxDistance = 60f;
             attackNearbyEnemies.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
             attackNearbyEnemies.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
-            attackNearbyEnemies.moveInputScale = 1f;
+            attackNearbyEnemies.moveInputScale = 3f;
             attackNearbyEnemies.aimType = AISkillDriver.AimType.AtCurrentEnemy;
             attackNearbyEnemies.buttonPressType = AISkillDriver.ButtonPressType.Hold;
             attackNearbyEnemies.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
             attackNearbyEnemies.driverUpdateTimerOverride = 1f;
             attackNearbyEnemies.activationRequiresAimTargetLoS = true;
-            attackNearbyEnemies.noRepeat = true;
-            
-            AISkillDriver softLeashToLeader = prefab.AddComponent<AISkillDriver>();
-            softLeashToLeader.customName = "SoftLeashToLeader";
-            softLeashToLeader.skillSlot = SkillSlot.None;
-            softLeashToLeader.minDistance = 15f;
-            softLeashToLeader.moveTargetType = AISkillDriver.TargetType.CurrentLeader;
-            softLeashToLeader.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
-            softLeashToLeader.moveInputScale = 1f;
-            softLeashToLeader.aimType = AISkillDriver.AimType.AtCurrentEnemy;
-            softLeashToLeader.driverUpdateTimerOverride = 1f;
-            softLeashToLeader.resetCurrentEnemyOnNextDriverSelection = true;
-            softLeashToLeader.noRepeat = true;
 
             AISkillDriver strafeNearbyEnemies = prefab.AddComponent<AISkillDriver>();
             strafeNearbyEnemies.customName = "StrafeNearbyEnemies";
@@ -90,6 +76,17 @@ namespace EliteVariety.CharacterMasters
             strafeNearbyEnemies.moveInputScale = 1f;
             strafeNearbyEnemies.aimType = AISkillDriver.AimType.AtCurrentEnemy;
             strafeNearbyEnemies.buttonPressType = AISkillDriver.ButtonPressType.Hold;
+
+            AISkillDriver softLeashToLeader = prefab.AddComponent<AISkillDriver>();
+            softLeashToLeader.customName = "SoftLeashToLeader";
+            softLeashToLeader.skillSlot = SkillSlot.None;
+            softLeashToLeader.minDistance = 15f;
+            softLeashToLeader.moveTargetType = AISkillDriver.TargetType.CurrentLeader;
+            softLeashToLeader.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
+            softLeashToLeader.moveInputScale = 1f;
+            softLeashToLeader.aimType = AISkillDriver.AimType.AtCurrentEnemy;
+            softLeashToLeader.buttonPressType = AISkillDriver.ButtonPressType.Hold;
+            softLeashToLeader.resetCurrentEnemyOnNextDriverSelection = true;
 
             AISkillDriver chaseRandomEnemiesIfLeaderIsDead = prefab.AddComponent<AISkillDriver>();
             chaseRandomEnemiesIfLeaderIsDead.customName = "ChaseRandomEnemiesIfLeaderIsDead";
