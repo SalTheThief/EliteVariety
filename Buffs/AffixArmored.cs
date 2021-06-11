@@ -9,6 +9,8 @@ namespace EliteVariety.Buffs
 {
     public class AffixArmored : BaseBuff
     {
+        public static Sprite barrierBarSprite;
+
         public override Sprite LoadSprite(string assetName)
         {
             return Main.AssetBundle.LoadAsset<Sprite>("Assets/EliteVariety/Elites/Armored/BuffIcon.png");
@@ -21,6 +23,10 @@ namespace EliteVariety.Buffs
             On.RoR2.CharacterBody.OnInventoryChanged += CharacterBody_OnInventoryChanged;
             On.RoR2.CharacterBody.RecalculateStats += CharacterBody_RecalculateStats;
             GenericGameEvents.OnHitEnemy += GenericGameEvents_OnHitEnemy;
+
+            IL.RoR2.UI.HealthBar.UpdateBarInfos += HealthBar_UpdateBarInfos;
+
+            barrierBarSprite = Main.AssetBundle.LoadAsset<Sprite>("Assets/EliteVariety/Elites/Armored/texEliteArmoredBarrierRecolor.png");
         }
 
         public override void AfterContentPackLoaded()
@@ -63,6 +69,30 @@ namespace EliteVariety.Buffs
             if (damageInfo.procCoefficient > 0 && attackerInfo.body && victimInfo.body && attackerInfo.healthComponent && attackerInfo.body.HasBuff(buffDef))
             {
                 victimInfo.body.AddTimedBuff(EliteVarietyContent.Buffs.ArmoredHeavyStun, 1f * damageInfo.procCoefficient);
+            }
+        }
+
+        private void HealthBar_UpdateBarInfos(ILContext il)
+        {
+            ILCursor c = new ILCursor(il);
+            if (c.TryGotoNext(
+                MoveType.Before,
+                x => x.MatchDup(),
+                x => x.MatchLdarg(0),
+                x => x.MatchLdfld<RoR2.UI.HealthBar>("style"),
+                x => x.MatchLdflda(typeof(RoR2.UI.HealthBarStyle.BarStyle), "barrierBarStyle")
+            ))
+            {
+                c.Emit(OpCodes.Ldarg_0);
+                c.EmitDelegate<System.Action<RoR2.UI.HealthBar>>((healthBar) =>
+                {
+                    if (healthBar.source.body && healthBar.source.body.HasBuff(buffDef))
+                    {
+                        ref RoR2.UI.HealthBar.BarInfo barrierBarStyle = ref healthBar.barInfoCollection.barrierBarInfo;
+                        barrierBarStyle.color = new Color32(255, 209, 209, 255);
+                        barrierBarStyle.sprite = barrierBarSprite;
+                    }
+                });
             }
         }
     }
