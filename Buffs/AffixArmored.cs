@@ -24,9 +24,10 @@ namespace EliteVariety.Buffs
             On.RoR2.CharacterBody.RecalculateStats += CharacterBody_RecalculateStats;
             GenericGameEvents.OnHitEnemy += GenericGameEvents_OnHitEnemy;
 
-            IL.RoR2.UI.HealthBar.UpdateBarInfos += HealthBar_UpdateBarInfos;
-
             barrierBarSprite = Main.AssetBundle.LoadAsset<Sprite>("Assets/EliteVariety/Elites/Armored/texEliteArmoredBarrierRecolor.png");
+
+            On.RoR2.UI.HealthBar.UpdateBarInfos += HealthBar_UpdateBarInfos;
+
         }
 
         public override void AfterContentPackLoaded()
@@ -72,28 +73,13 @@ namespace EliteVariety.Buffs
             }
         }
 
-        private void HealthBar_UpdateBarInfos(ILContext il)
+        private void HealthBar_UpdateBarInfos(On.RoR2.UI.HealthBar.orig_UpdateBarInfos orig, RoR2.UI.HealthBar self)
         {
-            ILCursor c = new ILCursor(il);
-            if (c.TryGotoNext(
-                MoveType.Before,
-                x => x.MatchDup(),
-                x => x.MatchLdarg(0),
-                x => x.MatchLdfld<RoR2.UI.HealthBar>("style"),
-                x => x.MatchLdflda(typeof(RoR2.UI.HealthBarStyle.BarStyle), "barrierBarStyle")
-            ))
-            {
-                c.Emit(OpCodes.Ldarg_0);
-                c.EmitDelegate<System.Action<RoR2.UI.HealthBar>>((healthBar) =>
-                {
-                    if (healthBar.source.body && healthBar.source.body.HasBuff(buffDef))
-                    {
-                        ref RoR2.UI.HealthBar.BarInfo barrierBarStyle = ref healthBar.barInfoCollection.barrierBarInfo;
-                        barrierBarStyle.color = new Color32(255, 209, 209, 255);
-                        barrierBarStyle.sprite = barrierBarSprite;
-                    }
-                });
-            }
+            orig(self);
+
+            ref RoR2.UI.HealthBar.BarInfo barrierBarStyle = ref self.barInfoCollection.barrierBarInfo;
+            barrierBarStyle.color = Color.white;
+            barrierBarStyle.sprite = barrierBarSprite;
         }
     }
 }
