@@ -114,7 +114,7 @@ namespace EliteVariety.Equipment
             orbEffect.faceMovement = true;
             orbEffect.callArrivalIfTargetIsGone = false;
             DestroyOnTimer destroyOnTimer = linkOrbEffect.transform.Find("TrailParent/Trail").gameObject.AddComponent<DestroyOnTimer>();
-            destroyOnTimer.duration = 3f;
+            destroyOnTimer.duration = 0.5f;
             destroyOnTimer.enabled = false;
             MysticsRisky2Utils.MonoBehaviours.MysticsRisky2UtilsOrbEffectOnArrivalDefaults onArrivalDefaults = linkOrbEffect.AddComponent<MysticsRisky2Utils.MonoBehaviours.MysticsRisky2UtilsOrbEffectOnArrivalDefaults>();
             onArrivalDefaults.orbEffect = orbEffect;
