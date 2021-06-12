@@ -91,7 +91,7 @@ namespace EliteVariety.Buffs
                     {
                         droneSpawner = new DeployableMinionSpawner(body.master, deployableSlot, new Xoroshiro128Plus(Run.instance.seed ^ (ulong)GetInstanceID()))
                         {
-                            respawnInterval = 30f,
+                            respawnInterval = 60f,
                             minSpawnDistance = 10f,
                             maxSpawnDistance = 25f,
                             spawnCard = MysticsRisky2Utils.BaseAssetTypes.BaseCharacterMaster.characterSpawnCards.Find(x => x.name == "EliteVariety_cscTinkererDrone")
