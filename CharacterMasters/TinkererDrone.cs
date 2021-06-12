@@ -41,7 +41,7 @@ namespace EliteVariety.CharacterMasters
             AISkillDriver hardLeashToLeader = prefab.AddComponent<AISkillDriver>();
             hardLeashToLeader.customName = "HardLeashToLeader";
             hardLeashToLeader.skillSlot = SkillSlot.None;
-            hardLeashToLeader.minDistance = 30f;
+            hardLeashToLeader.minDistance = 60f;
             hardLeashToLeader.moveTargetType = AISkillDriver.TargetType.CurrentLeader;
             hardLeashToLeader.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
             hardLeashToLeader.moveInputScale = 1f;
@@ -52,6 +52,7 @@ namespace EliteVariety.CharacterMasters
             AISkillDriver attackNearbyEnemies = prefab.AddComponent<AISkillDriver>();
             attackNearbyEnemies.customName = "AttackNearbyEnemies";
             attackNearbyEnemies.skillSlot = SkillSlot.Primary;
+            attackNearbyEnemies.requireSkillReady = true;
             attackNearbyEnemies.minDistance = 15f;
             attackNearbyEnemies.maxDistance = 60f;
             attackNearbyEnemies.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
@@ -60,7 +61,7 @@ namespace EliteVariety.CharacterMasters
             attackNearbyEnemies.aimType = AISkillDriver.AimType.AtCurrentEnemy;
             attackNearbyEnemies.buttonPressType = AISkillDriver.ButtonPressType.Hold;
             attackNearbyEnemies.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
-            attackNearbyEnemies.driverUpdateTimerOverride = 1f;
+            attackNearbyEnemies.driverUpdateTimerOverride = 4f;
             attackNearbyEnemies.activationRequiresAimTargetLoS = true;
 
             AISkillDriver strafeNearbyEnemies = prefab.AddComponent<AISkillDriver>();
@@ -80,7 +81,7 @@ namespace EliteVariety.CharacterMasters
             AISkillDriver softLeashToLeader = prefab.AddComponent<AISkillDriver>();
             softLeashToLeader.customName = "SoftLeashToLeader";
             softLeashToLeader.skillSlot = SkillSlot.None;
-            softLeashToLeader.minDistance = 15f;
+            softLeashToLeader.minDistance = 20f;
             softLeashToLeader.moveTargetType = AISkillDriver.TargetType.CurrentLeader;
             softLeashToLeader.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
             softLeashToLeader.moveInputScale = 1f;
