@@ -475,8 +475,11 @@ namespace EliteVariety.Buffs
                 if (!target && targetNetId != NetworkInstanceId.Invalid)
                 {
                     GameObject target1Obj = Util.FindNetworkObject(targetNetId);
-                    if (target1Obj) target = target1Obj.transform;
-                    targetNetId = NetworkInstanceId.Invalid;
+                    if (target1Obj)
+                    {
+                        target = target1Obj.transform;
+                        targetNetId = NetworkInstanceId.Invalid;
+                    }
                 }
             }
         }
