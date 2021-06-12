@@ -48,12 +48,12 @@ namespace EliteVariety.Items
             base.OnLoad();
 
             CharacterStats.armorModifiers.Add(new CharacterStats.FlatStatModifier {
-                amount = 5f,
+                amount = 2f,
                 times = (genericCharacterInfo) => TinkererDroneStatBonusModifierTimes(genericCharacterInfo)
             });
             CharacterStats.attackSpeedModifiers.Add(new CharacterStats.StatModifier
             {
-                flat = 0.1f,
+                flat = 0.05f,
                 times = (genericCharacterInfo) => TinkererDroneStatBonusModifierTimes(genericCharacterInfo)
             });
             CharacterStats.cooldownModifiers.Add(new CharacterStats.StatModifier
@@ -69,11 +69,6 @@ namespace EliteVariety.Items
             CharacterStats.healthModifiers.Add(new CharacterStats.StatModifier
             {
                 flat = 10,
-                times = (genericCharacterInfo) => TinkererDroneStatBonusModifierTimes(genericCharacterInfo)
-            });
-            CharacterStats.moveSpeedModifiers.Add(new CharacterStats.StatModifier
-            {
-                multiplier = 0.1f,
                 times = (genericCharacterInfo) => TinkererDroneStatBonusModifierTimes(genericCharacterInfo)
             });
             CharacterStats.regenModifiers.Add(new CharacterStats.FlatStatModifier
