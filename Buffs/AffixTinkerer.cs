@@ -140,6 +140,8 @@ namespace EliteVariety.Buffs
                         {
                             component.droneStatBonus = droneStatBonus;
                         }
+                        CharacterBody droneBody = droneMaster.GetBody();
+                        if (droneBody) Utils.ForceRecalculateStats(droneBody);
                     }
                 }
             }
