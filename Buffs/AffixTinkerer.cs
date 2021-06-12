@@ -16,10 +16,18 @@ namespace EliteVariety.Buffs
     public class AffixTinkerer : BaseBuff
     {
         public static DeployableSlot deployableSlot = (DeployableSlot)(-19085); // this will break if any other mod uses the same slot index. consider making a custom MysticsRisky2Utils deployable system
+        public static GameObject linkLinePrefab;
 
         public override Sprite LoadSprite(string assetName)
         {
             return Main.AssetBundle.LoadAsset<Sprite>("Assets/EliteVariety/Elites/Tinkerer/BuffIcon.png");
+        }
+
+        public override void OnPluginAwake()
+        {
+            base.OnPluginAwake();
+            linkLinePrefab = Utils.CreateBlankPrefab(Main.TokenPrefix + "AffixTinkererLinkLine", true);
+            linkLinePrefab.GetComponent<NetworkIdentity>().localPlayerAuthority = true;
         }
 
         public override void OnLoad()
@@ -30,8 +38,14 @@ namespace EliteVariety.Buffs
             GenericGameEvents.OnHitEnemy += GenericGameEvents_OnHitEnemy;
 
             NetworkingAPI.RegisterMessageType<EliteVarietyAffixTinkererBehavior.EliteVarietyAffixTinkererRecipientBehavior.SyncDroneStatBonus>();
+            NetworkingAPI.RegisterMessageType<EliteVarietyAffixTinkererLinkLine.SyncSetTargets>();
 
             On.RoR2.CharacterMaster.GetDeployableSameSlotLimit += CharacterMaster_GetDeployableSameSlotLimit;
+
+            Utils.CopyChildren(Main.AssetBundle.LoadAsset<GameObject>("Assets/EliteVariety/Elites/Tinkerer/TinkererDroneLinkLine.prefab"), linkLinePrefab);
+            EliteVarietyAffixTinkererLinkLine linkLineComponent = linkLinePrefab.AddComponent<EliteVarietyAffixTinkererLinkLine>();
+            linkLineComponent.startVelocity = new Vector3(0f, 15f, 0f);
+            linkLineComponent.endVelocity = new Vector3(0f, -5f, 0f);
         }
 
         public override void AfterContentPackLoaded()
@@ -68,6 +82,19 @@ namespace EliteVariety.Buffs
             public int droneStatBonus = 0;
             public Dictionary<Inventory, List<StolenItemInfo>> stealDictionary;
             public List<ItemTransferOrb> orbsInFlight;
+            private List<EliteVarietyAffixTinkererLinkLine> _linkLines;
+            public List<EliteVarietyAffixTinkererLinkLine> linkLines
+            {
+                get
+                {
+                    _linkLines.RemoveAll(x => !x);
+                    return _linkLines;
+                }
+                set
+                {
+                    _linkLines = value;
+                }
+            }
 
             public class StolenItemInfo
             {
@@ -81,6 +108,7 @@ namespace EliteVariety.Buffs
                 stealDictionary = new Dictionary<Inventory, List<StolenItemInfo>>();
                 orbsInFlight = new List<ItemTransferOrb>();
                 droneMasters = new List<CharacterMaster>();
+                linkLines = new List<EliteVarietyAffixTinkererLinkLine>();
             }
 
             public void FixedUpdate()
@@ -156,8 +184,21 @@ namespace EliteVariety.Buffs
                     if (droneMaster && droneMaster.inventory)
                     {
                         droneMaster.inventory.GiveItem(EliteVarietyContent.Items.TinkererDroneStatBonus);
+                        droneMaster.gameObject.AddComponent<EliteVarietyAffixTinkererRecipientBehavior>();
                     }
+                    droneMaster.onBodyStart += DroneMaster_onBodyStart;
                 }
+            }
+
+            public void DroneMaster_onBodyStart(CharacterBody droneBody)
+            {
+                GameObject linkLine = Object.Instantiate(linkLinePrefab);
+                EliteVarietyAffixTinkererLinkLine linkLineComponent = linkLine.GetComponent<EliteVarietyAffixTinkererLinkLine>();
+                linkLineComponent.SetTargets(
+                    body.mainHurtBox ? body.mainHurtBox.transform : null,
+                    droneBody.mainHurtBox ? droneBody.mainHurtBox.transform : null
+                );
+                linkLines.Add(linkLineComponent);
             }
 
             public class EliteVarietyAffixTinkererRecipientBehavior : MonoBehaviour
@@ -244,6 +285,14 @@ namespace EliteVariety.Buffs
                 {
                     droneMaster.TrueKill();
                 }
+
+                if (droneSpawner != null) droneSpawner.Dispose();
+                droneSpawner = null;
+
+                foreach (EliteVarietyAffixTinkererLinkLine linkLine in linkLines)
+                {
+                    Object.Destroy(linkLine.gameObject);
+                }
             }
 
             public void StealFrom(Inventory inventory, Vector3 emitPosition, NetworkIdentity networkIdentity)
@@ -315,6 +364,119 @@ namespace EliteVariety.Buffs
                         }
                     }, body.networkIdentity);
                     orbsInFlight.Add(item);
+                }
+            }
+        }
+
+        public class EliteVarietyAffixTinkererLinkLine : MonoBehaviour
+        {
+            public Transform target1;
+            public Transform target2;
+            public NetworkInstanceId target1NetId = NetworkInstanceId.Invalid;
+            public NetworkInstanceId target2NetId = NetworkInstanceId.Invalid;
+            public Vector3 startVelocity = Vector3.zero;
+            public Vector3 endVelocity = Vector3.zero;
+            public LineRenderer line;
+
+            public void Awake()
+            {
+                line = GetComponent<LineRenderer>();
+            }
+
+            public void SetTargets(Transform target1, Transform target2)
+            {
+                this.target1 = target1;
+                this.target2 = target2;
+                
+                if (NetworkServer.active)
+                {
+                    NetworkInstanceId GetNetId(Transform from)
+                    {
+                        if (from)
+                        {
+                            NetworkIdentity networkIdentity = from.GetComponent<NetworkIdentity>();
+                            if (networkIdentity) return networkIdentity.netId;
+                        }
+                        return NetworkInstanceId.Invalid;
+                    }
+                    new SyncSetTargets(gameObject.GetComponent<NetworkIdentity>().netId, GetNetId(target1), GetNetId(target2)).Send(NetworkDestination.Clients);
+                }
+            }
+
+            public class SyncSetTargets : INetMessage
+            {
+                NetworkInstanceId objID;
+                NetworkInstanceId target1NetId;
+                NetworkInstanceId target2NetId;
+
+                public SyncSetTargets()
+                {
+                }
+
+                public SyncSetTargets(NetworkInstanceId objID, NetworkInstanceId target1NetId, NetworkInstanceId target2NetId)
+                {
+                    this.objID = objID;
+                    this.target1NetId = target1NetId;
+                    this.target2NetId = target2NetId;
+                }
+
+                public void Deserialize(NetworkReader reader)
+                {
+                    objID = reader.ReadNetworkId();
+                    target1NetId = reader.ReadNetworkId();
+                    target2NetId = reader.ReadNetworkId();
+                }
+
+                public void OnReceived()
+                {
+                    if (NetworkServer.active) return;
+                    NetworkHelper.EnqueueOnSpawnedOnClientEvent(objID, (gameObject) =>
+                    {
+                        EliteVarietyAffixTinkererLinkLine component = gameObject.GetComponent<EliteVarietyAffixTinkererLinkLine>();
+                        if (component)
+                        {
+                            component.target1NetId = target1NetId;
+                            component.target2NetId = target2NetId;
+                        }
+                    });
+                }
+
+                public void Serialize(NetworkWriter writer)
+                {
+                    writer.Write(objID);
+                    writer.Write(target1NetId);
+                    writer.Write(target2NetId);
+                }
+            }
+
+            public void Update()
+            {
+                ResolveTargetNetId(ref target1, ref target1NetId);
+                ResolveTargetNetId(ref target2, ref target2NetId);
+                if (target1 && target2)
+                {
+                    if (!line.enabled) line.enabled = true;
+                    int vertexCount = line.positionCount;
+                    for (var i = 0; i < vertexCount; i++)
+                    {
+                        float progress = (float)i / (float)vertexCount;
+                        Vector3 vertexPos = Vector3.Lerp(target1.position + startVelocity * progress, target2.position + endVelocity * (1f - progress), progress);
+                        line.SetPosition(i, vertexPos);
+                    }
+                }
+                else
+                {
+                    if (line.enabled) line.enabled = false;
+                }
+            }
+
+            public static void ResolveTargetNetId(ref Transform target, ref NetworkInstanceId targetNetId)
+            {
+                if (!target && targetNetId != NetworkInstanceId.Invalid)
+                {
+                    GameObject target1Obj = Util.FindNetworkObject(targetNetId);
+                    if (target1Obj) target = target1Obj.transform;
+                    targetNetId = NetworkInstanceId.Invalid;
                 }
             }
         }
