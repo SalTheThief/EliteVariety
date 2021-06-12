@@ -41,7 +41,7 @@ namespace EliteVariety.CharacterMasters
             AISkillDriver hardLeashToLeader = prefab.AddComponent<AISkillDriver>();
             hardLeashToLeader.customName = "HardLeashToLeader";
             hardLeashToLeader.skillSlot = SkillSlot.None;
-            hardLeashToLeader.minDistance = 60f;
+            hardLeashToLeader.minDistance = 40f;
             hardLeashToLeader.moveTargetType = AISkillDriver.TargetType.CurrentLeader;
             hardLeashToLeader.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
             hardLeashToLeader.moveInputScale = 1f;
@@ -57,7 +57,7 @@ namespace EliteVariety.CharacterMasters
             attackNearbyEnemies.maxDistance = 60f;
             attackNearbyEnemies.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
             attackNearbyEnemies.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
-            attackNearbyEnemies.moveInputScale = 3f;
+            attackNearbyEnemies.moveInputScale = 0.2f;
             attackNearbyEnemies.aimType = AISkillDriver.AimType.AtCurrentEnemy;
             attackNearbyEnemies.buttonPressType = AISkillDriver.ButtonPressType.Hold;
             attackNearbyEnemies.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
