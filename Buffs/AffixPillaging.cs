@@ -88,7 +88,7 @@ namespace EliteVariety.Buffs
         public class EliteVarietyAffixPillagingBehavior : CharacterBody.ItemBehavior
         {
             public float allyGoldStealRadius = 20f;
-            public float allyGoldStealInterval = 5f;
+            public float allyGoldStealInterval = 3f;
             public float allyGoldStealStopwatch = 0f;
             public uint allyGoldStealBaseAmount = 3u;
             public int allyGoldStealMaxAllies = 5;
@@ -175,7 +175,7 @@ namespace EliteVariety.Buffs
 				EliteVarietyAffixPillagingBehavior component = damageReport.attackerBody.GetComponent<EliteVarietyAffixPillagingBehavior>();
 				if (component)
 				{
-					uint stealAmount = (uint)Mathf.Max(10u * Run.instance.difficultyCoefficient * damageReport.damageInfo.procCoefficient, 1u);
+					uint stealAmount = (uint)Mathf.Max(20u * Run.instance.difficultyCoefficient * damageReport.damageInfo.procCoefficient, 1u);
 					bool stolen = component.StealGold(damageReport.victimBody, stealAmount, true);
 					if (stolen)
 					{
