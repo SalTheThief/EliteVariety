@@ -210,7 +210,7 @@ namespace EliteVariety.Buffs
                     }
                     else
                     {
-                        if (body.healthComponent.alive != deathRadiusShrunk)
+                        if (!body.healthComponent.alive != deathRadiusShrunk)
                         {
                             deathRadiusShrunk = body.healthComponent.alive;
                             foreach (BuffWard buffWard in buffAura.GetComponents<BuffWard>())
