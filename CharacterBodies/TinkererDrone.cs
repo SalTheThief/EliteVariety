@@ -145,6 +145,9 @@ namespace EliteVariety.CharacterBodies
             characterDeathBehavior.idleStateMachine = new EntityStateMachine[] {
                 weaponStateMachine
             };
+            EliteVarietyContent.Resources.entityStateTypes.Add(typeof(TinkererDroneSpawnState));
+            EliteVarietyContent.Resources.entityStateTypes.Add(typeof(TinkererDroneChargeLaser));
+            EliteVarietyContent.Resources.entityStateTypes.Add(typeof(TinkererDroneFireLaser));
             EliteVarietyContent.Resources.entityStateTypes.Add(typeof(TinkererDroneDeath));
 
             // skills
@@ -209,9 +212,6 @@ namespace EliteVariety.CharacterBodies
                 }
             };
 			AfterCharacterModelSetUp();
-
-			EliteVarietyContent.Resources.entityStateTypes.Add(typeof(TinkererDroneChargeLaser));
-            EliteVarietyContent.Resources.entityStateTypes.Add(typeof(TinkererDroneSpawnState));
 
             TinkererDroneChargeLaser.chargeEffectPrefab = Main.AssetBundle.LoadAsset<GameObject>("Assets/EliteVariety/CharacterBodies/TinkererDrone/LaserChargeEffect.prefab");
             ScaleParticleSystemDuration scaleParticleSystemDuration = TinkererDroneChargeLaser.chargeEffectPrefab.AddComponent<ScaleParticleSystemDuration>();
