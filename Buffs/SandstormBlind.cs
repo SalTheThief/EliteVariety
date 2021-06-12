@@ -38,6 +38,7 @@ namespace EliteVariety.Buffs
             rampFog.fogColorStart.Override(new Color32(255, 234, 206, 0));
             rampFog.fogColorMid.Override(new Color32(255, 221, 178, 127));
             rampFog.fogColorEnd.Override(new Color32(255, 196, 114, 255));
+            cameraEffect.transform.Find("CameraEffect/PP").GetComponent<PostProcessVolume>().priority = 100000f;
 
             cameraEffect.transform.Find("CameraEffect/PP").gameObject.layer = LayerIndex.postProcess.intVal;
 
