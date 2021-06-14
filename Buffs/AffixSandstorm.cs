@@ -27,7 +27,6 @@ namespace EliteVariety.Buffs
         {
             base.OnPluginAwake();
             sandstormPrefab = Utils.CreateBlankPrefab(Main.TokenPrefix + "AffixSandstormStorm", true);
-            sandstormPrefab.GetComponent<NetworkIdentity>().localPlayerAuthority = true;
             vehiclePrefab = Utils.CreateBlankPrefab(Main.TokenPrefix + "AffixSandstormVehicle", true);
         }
 
@@ -41,7 +40,7 @@ namespace EliteVariety.Buffs
             Utils.CopyChildren(Main.AssetBundle.LoadAsset<GameObject>("Assets/EliteVariety/Elites/Sandstorm/Sandstorm.prefab"), sandstormPrefab);
             NetworkedBodyAttachment networkedBodyAttachment = sandstormPrefab.AddComponent<NetworkedBodyAttachment>();
             networkedBodyAttachment.shouldParentToAttachedBody = true;
-            networkedBodyAttachment.forceHostAuthority = false;
+            networkedBodyAttachment.forceHostAuthority = true;
             TeamFilter teamFilter = sandstormPrefab.AddComponent<TeamFilter>();
             EliteVarietySandstormBehavior sandstormBehavior = sandstormPrefab.AddComponent<EliteVarietySandstormBehavior>();
             sandstormBehavior.colliderListComponent = sandstormPrefab.transform.Find("Collision").gameObject.AddComponent<MysticsRisky2Utils.MonoBehaviours.MysticsRisky2UtilsColliderTriggerList>();
