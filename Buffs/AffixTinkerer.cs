@@ -15,7 +15,7 @@ namespace EliteVariety.Buffs
 {
     public class AffixTinkerer : BaseBuff
     {
-        public static DeployableSlot deployableSlot = (DeployableSlot)(-19085); // this will break if any other mod uses the same slot index. consider making a custom MysticsRisky2Utils deployable system
+        public static DeployableSlot deployableSlot;
         public static GameObject linkLinePrefab;
 
         public override Sprite LoadSprite(string assetName)
@@ -39,12 +39,17 @@ namespace EliteVariety.Buffs
             NetworkingAPI.RegisterMessageType<EliteVarietyAffixTinkererBehavior.EliteVarietyAffixTinkererRecipientBehavior.SyncDroneStatBonus>();
             NetworkingAPI.RegisterMessageType<EliteVarietyAffixTinkererLinkLine.SyncSetTargets>();
 
-            On.RoR2.CharacterMaster.GetDeployableSameSlotLimit += CharacterMaster_GetDeployableSameSlotLimit;
-
             Utils.CopyChildren(Main.AssetBundle.LoadAsset<GameObject>("Assets/EliteVariety/Elites/Tinkerer/TinkererDroneLinkLine.prefab"), linkLinePrefab);
             EliteVarietyAffixTinkererLinkLine linkLineComponent = linkLinePrefab.AddComponent<EliteVarietyAffixTinkererLinkLine>();
             linkLineComponent.startVelocity = new Vector3(0f, 15f, 0f);
             linkLineComponent.endVelocity = new Vector3(0f, -5f, 0f);
+
+            deployableSlot = R2API.DeployableAPI.RegisterDeployableSlot(GetTinkererDroneDeployableSameSlotLimit);
+        }
+
+        public static int GetTinkererDroneDeployableSameSlotLimit(CharacterMaster self, int deployableCountMultiplier)
+        {
+            return 1 * deployableCountMultiplier;
         }
 
         public override void AfterContentPackLoaded()
@@ -490,17 +495,6 @@ namespace EliteVariety.Buffs
                 EliteVarietyAffixTinkererBehavior component = attackerInfo.body.GetComponent<EliteVarietyAffixTinkererBehavior>();
                 if (component) component.StealFrom(victimInfo.inventory, victimInfo.body.corePosition, victimInfo.body.networkIdentity);
             }
-        }
-
-        public int CharacterMaster_GetDeployableSameSlotLimit(On.RoR2.CharacterMaster.orig_GetDeployableSameSlotLimit orig, CharacterMaster self, DeployableSlot slot)
-        {
-            if (slot == deployableSlot)
-            {
-                int num = 1;
-                if (RunArtifactManager.instance.IsArtifactEnabled(RoR2Content.Artifacts.swarmsArtifactDef)) num *= 2;
-                return 1 * num;
-            }
-            return orig(self, slot);
         }
     }
 }
