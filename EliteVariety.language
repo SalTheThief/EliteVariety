@@ -16,12 +16,16 @@
     "EQUIPMENT_ELITEVARIETY_AFFIXTINKERER_NAME": "Neural Link",
     "EQUIPMENT_ELITEVARIETY_AFFIXTINKERER_PICKUP": "Become an aspect of automatization.",
 
+    "EQUIPMENT_ELITEVARIETY_AFFIXIMPPLANE_NAME": "Invasion from the Red Plane",
+    "EQUIPMENT_ELITEVARIETY_AFFIXIMPPLANE_PICKUP": "Become an aspect of violence.",
+
     //[ELITE MODIFIERS]
     "ELITE_MODIFIER_ELITEVARIETY_ARMORED": "Ironclad {0}",
     "ELITE_MODIFIER_ELITEVARIETY_BUFFING": "Invigorating {0}",
     "ELITE_MODIFIER_ELITEVARIETY_PILLAGING": "Pillaging {0}",
     "ELITE_MODIFIER_ELITEVARIETY_SANDSTORM": "Arenaceous {0}",
     "ELITE_MODIFIER_ELITEVARIETY_TINKERER": "Tinkering {0}",
+    "ELITE_MODIFIER_ELITEVARIETY_IMPPLANE": "Erythrite {0}",
 
     //[CHARACTER BODIES]
     "ELITEVARIETY_TINKERERDRONE_BODY_NAME": "Tinkerer's Drone",
@@ -37,6 +41,7 @@
     "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXPILLAGING_PICKUP": "On use, spend half of your gold to gain a random item. The more gold spent, the higher chance of getting a rarer item.",
     "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXSANDSTORM_PICKUP": "Dash on use, knocking nearby enemies up.",
     "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXTINKERER_PICKUP": "Heal drones on use.",
+    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXIMPPLANE_PICKUP": "Summon the Imp Overlord on use.",
 
     //[CUSTOM]
     "ELITEVARIETY_SANDSTORM_VEHICLE_EXIT_CONTEXT": "Cancel dash"
@@ -58,12 +63,16 @@
     "EQUIPMENT_ELITEVARIETY_AFFIXTINKERER_NAME": "Нейронная связь",
     "EQUIPMENT_ELITEVARIETY_AFFIXTINKERER_PICKUP": "Станьте воплощением автоматизации.",
 
+    "EQUIPMENT_ELITEVARIETY_AFFIXIMPPLANE_NAME": "Вторжение из Красного измерения",
+    "EQUIPMENT_ELITEVARIETY_AFFIXIMPPLANE_PICKUP": "Станьте воплощением жестокости.",
+
     //[ELITE MODIFIERS]
     "ELITE_MODIFIER_ELITEVARIETY_ARMORED": "Нерушим. {0}",
     "ELITE_MODIFIER_ELITEVARIETY_BUFFING": "Бодрящ. {0}",
     "ELITE_MODIFIER_ELITEVARIETY_PILLAGING": "Ворующ. {0}",
     "ELITE_MODIFIER_ELITEVARIETY_SANDSTORM": "Песчан. {0}",
     "ELITE_MODIFIER_ELITEVARIETY_TINKERER": "Ремонтирующ. {0}",
+    "ELITE_MODIFIER_ELITEVARIETY_IMPPLANE": "Эритрин: {0}",
 
     //[CHARACTER BODIES]
     "ELITEVARIETY_TINKERERDRONE_BODY_NAME": "Дрон ремонтника",
@@ -79,6 +88,7 @@
     "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXPILLAGING_PICKUP": "При использовании потратьте половину золота и получите случайный предмет. Чем больше золота потрачено, тем выше шанс получить более редкий предмет.",
     "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXSANDSTORM_PICKUP": "При использовании совершает рывок, подбрасывая близжайших врагов.",
     "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXTINKERER_PICKUP": "Лечит дронов при использовании.",
+    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXIMPPLANE_PICKUP": "Призывает Владыку бесов при использовании.",
 
     //[CUSTOM]
     "ELITEVARIETY_SANDSTORM_VEHICLE_EXIT_CONTEXT": "Прекратить рывок"

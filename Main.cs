@@ -21,7 +21,7 @@ namespace EliteVariety
     [BepInDependency(MysticsRisky2UtilsPlugin.PluginGUID)]
     [BepInDependency(AspectAbilities.AspectAbilitiesPlugin.PluginGUID, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
-    [R2APISubmoduleDependency(nameof(NetworkingAPI), nameof(PrefabAPI), nameof(SoundAPI))]
+    [R2APISubmoduleDependency(nameof(DotAPI), nameof(DeployableAPI), nameof(NetworkingAPI), nameof(PrefabAPI), nameof(SoundAPI))]
     public class EliteVarietyPlugin : BaseUnityPlugin
     {
         public const string PluginGUID = "com.themysticsword.elitevariety";
@@ -238,6 +238,7 @@ namespace EliteVariety
         {
             public static EquipmentDef AffixArmored;
             public static EquipmentDef AffixBuffing;
+            public static EquipmentDef AffixImpPlane;
             public static EquipmentDef AffixPillaging;
             public static EquipmentDef AffixSandstorm;
             public static EquipmentDef AffixTinkerer;
@@ -247,11 +248,13 @@ namespace EliteVariety
         {
             public static BuffDef AffixArmored;
             public static BuffDef AffixBuffing;
+            public static BuffDef AffixImpPlane;
             public static BuffDef AffixPillaging;
             public static BuffDef AffixSandstorm;
             public static BuffDef AffixTinkerer;
             public static BuffDef ArmoredHeavyStun;
             public static BuffDef ArmoredSelfBuff;
+            public static BuffDef ImpPlaneImpaled;
             public static BuffDef SandstormBlind;
         }
 
@@ -259,6 +262,7 @@ namespace EliteVariety
         {
             public static EliteDef Armored;
             public static EliteDef Buffing;
+            public static EliteDef ImpPlane;
             public static EliteDef Pillaging;
             public static EliteDef Sandstorm;
             public static EliteDef Tinkerer;
