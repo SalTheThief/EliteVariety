@@ -32,7 +32,7 @@ namespace EliteVariety.Buffs
                 DotController.DotStack oldDotStack = self.dotStackList.FirstOrDefault(x => x.dotIndex == dotStack.dotIndex);
                 if (oldDotStack != null)
                 {
-                    self.RemoveDotStackAtServer(self.dotStackList.IndexOf(dotStack));
+                    self.RemoveDotStackAtServer(self.dotStackList.IndexOf(oldDotStack));
                 }
                 dotStack.damage = Mathf.Min(self.victimHealthComponent.fullCombinedHealth * 0.2f, dotStack.damage);
             }));
