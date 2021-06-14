@@ -27,7 +27,6 @@ namespace EliteVariety.Buffs
         {
             base.OnPluginAwake();
             linkLinePrefab = Utils.CreateBlankPrefab(Main.TokenPrefix + "AffixTinkererLinkLine", true);
-            linkLinePrefab.GetComponent<NetworkIdentity>().localPlayerAuthority = true;
         }
 
         public override void OnLoad()
