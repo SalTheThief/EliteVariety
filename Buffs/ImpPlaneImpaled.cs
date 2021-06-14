@@ -34,7 +34,7 @@ namespace EliteVariety.Buffs
                 {
                     self.RemoveDotStackAtServer(self.dotStackList.IndexOf(oldDotStack));
                 }
-                dotStack.damage = Mathf.Min(self.victimHealthComponent.fullCombinedHealth * 0.2f, dotStack.damage);
+                dotStack.damage = Mathf.Min(self.victimHealthComponent.fullCombinedHealth * 0.25f, dotStack.damage);
             }));
 
             GameObject debuffedVFX = PrefabAPI.InstantiateClone(Main.AssetBundle.LoadAsset<GameObject>("Assets/EliteVariety/Elites/ImpPlane/ImpaledVFX.prefab"), Main.TokenPrefix + "ImpaledVFX", false);
