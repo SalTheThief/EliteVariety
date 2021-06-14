@@ -93,11 +93,14 @@ namespace EliteVariety.Buffs
             public uint allyGoldStealBaseAmount = 3u;
             public int allyGoldStealMaxAllies = 5;
 			public EliteVarietyAffixPillagingDeathRewardsModifier deathRewardsModifier;
+			public List<CharacterBody> bodiesStolenFrom;
 
 			public void Start()
             {
 				deathRewardsModifier = GetComponent<EliteVarietyAffixPillagingDeathRewardsModifier>();
 				if (!deathRewardsModifier) deathRewardsModifier = gameObject.AddComponent<EliteVarietyAffixPillagingDeathRewardsModifier>();
+
+				bodiesStolenFrom = new List<CharacterBody>();
 			}
 
             public void FixedUpdate()
@@ -116,13 +119,15 @@ namespace EliteVariety.Buffs
 
 					List<Collider> colliders = Physics.OverlapSphere(body.corePosition, allyGoldStealRadius, LayerIndex.entityPrecise.mask).ToList();
 					int alliesToStealFrom = allyGoldStealMaxAllies;
+					bodiesStolenFrom.Clear();
 					while (alliesToStealFrom > 0 && colliders.Count > 0)
                     {
 						Collider collider = RoR2Application.rng.NextElementUniform(colliders);
 						colliders.Remove(collider);
 						CharacterBody colliderBody = Util.HurtBoxColliderToBody(collider);
-						if (colliderBody && colliderBody != body && TeamComponent.GetObjectTeam(colliderBody.gameObject) == TeamComponent.GetObjectTeam(gameObject) && !colliderBody.HasBuff(EliteVarietyContent.Buffs.AffixPillaging))
+						if (colliderBody && !bodiesStolenFrom.Contains(colliderBody) && colliderBody != body && TeamComponent.GetObjectTeam(colliderBody.gameObject) == TeamComponent.GetObjectTeam(gameObject) && !colliderBody.HasBuff(EliteVarietyContent.Buffs.AffixPillaging))
 						{
+							bodiesStolenFrom.Add(colliderBody);
 							HealthComponent healthComponent = colliderBody.healthComponent;
 							if (healthComponent && healthComponent.alive)
 							{
