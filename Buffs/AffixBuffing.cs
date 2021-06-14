@@ -70,7 +70,7 @@ namespace EliteVariety.Buffs
             buffWardSpecial.enabled = false;
 
             specialBuffTriggerSound = ScriptableObject.CreateInstance<NetworkSoundEventDef>();
-            specialBuffTriggerSound.eventName = "Play_teamWarCry_activate";
+            specialBuffTriggerSound.eventName = "EliteVariety_Play_item_proc_affixbuffing";
             EliteVarietyContent.Resources.networkSoundEventDefs.Add(specialBuffTriggerSound);
         }
 
