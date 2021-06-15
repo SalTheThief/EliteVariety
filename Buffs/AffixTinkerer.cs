@@ -99,6 +99,9 @@ namespace EliteVariety.Buffs
                     _linkLines = value;
                 }
             }
+            public int quickerRespawns = 0;
+            public float quickerRespawnStopwatch = 0f;
+            public float quickerRespawnDuration = 0.3f;
 
             public class StolenItemInfo
             {
@@ -117,18 +120,35 @@ namespace EliteVariety.Buffs
 
             public void FixedUpdate()
             {
-                if (NetworkServer.active)
+                if (NetworkServer.active && isActiveAndEnabled)
                 {
-                    if (droneSpawner == null && isActiveAndEnabled)
+                    if (body.master)
                     {
-                        droneSpawner = new DeployableMinionSpawner(body.master, deployableSlot, new Xoroshiro128Plus(Run.instance.seed ^ (ulong)GetInstanceID()))
+                        if (droneSpawner == null)
                         {
-                            respawnInterval = 60f,
-                            minSpawnDistance = 10f,
-                            maxSpawnDistance = 25f,
-                            spawnCard = MysticsRisky2Utils.BaseAssetTypes.BaseCharacterMaster.characterSpawnCards.Find(x => x.name == "EliteVariety_cscTinkererDrone")
-                        };
-                        droneSpawner.onMinionSpawnedServer += OnMinionSpawnedServer;
+                            droneSpawner = new DeployableMinionSpawner(body.master, deployableSlot, new Xoroshiro128Plus(Run.instance.seed ^ (ulong)GetInstanceID()))
+                            {
+                                respawnInterval = 60f,
+                                spawnCard = MysticsRisky2Utils.BaseAssetTypes.BaseCharacterMaster.characterSpawnCards.Find(x => x.name == "EliteVariety_cscTinkererDrone")
+                            };
+                            droneSpawner.onMinionSpawnedServer += OnMinionSpawnedServer;
+
+                            droneSpawner.respawnStopwatch = 0f;
+                            quickerRespawns = body.master.GetDeployableSameSlotLimit(deployableSlot);
+                        }
+                        else
+                        {
+                            if (quickerRespawns > 0)
+                            {
+                                quickerRespawnStopwatch += Time.fixedDeltaTime;
+                                if (quickerRespawnStopwatch >= quickerRespawnDuration)
+                                {
+                                    quickerRespawnStopwatch = 0f;
+                                    quickerRespawns--;
+                                    droneSpawner.SpawnMinion(droneSpawner.spawnCard, body);
+                                }
+                            }
+                        }
                     }
                 }
             }
