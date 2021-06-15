@@ -243,6 +243,43 @@ namespace EliteVariety.Buffs
                         }
                     }
                 }
+                public Inventory inventory;
+                public MinionOwnership minionOwnership;
+                public int healthDecaysGained = 0;
+                public static int globalHealthDecaysToGiveOnOwnerLost = 10;
+
+                public void Start()
+                {
+                    CharacterMaster master = GetComponent<CharacterMaster>();
+                    if (master)
+                    {
+                        inventory = master.inventory;
+                        minionOwnership = master.minionOwnership;
+                    }
+                }
+
+                public void FixedUpdate()
+                {
+                    if (NetworkServer.active && minionOwnership)
+                    {
+                        if (minionOwnership.ownerMaster)
+                        {
+                            if (healthDecaysGained != 0)
+                            {
+                                healthDecaysGained = 0;
+                                inventory.RemoveItem(RoR2Content.Items.HealthDecay, Mathf.Min(healthDecaysGained, inventory.GetItemCount(RoR2Content.Items.HealthDecay)));
+                            }
+                        }
+                        else
+                        {
+                            if (healthDecaysGained == 0)
+                            {
+                                healthDecaysGained += globalHealthDecaysToGiveOnOwnerLost;
+                                inventory.GiveItem(RoR2Content.Items.HealthDecay, globalHealthDecaysToGiveOnOwnerLost);
+                            }
+                        }
+                    }
+                }
 
                 public class SyncDroneStatBonus : INetMessage
                 {
@@ -272,6 +309,7 @@ namespace EliteVariety.Buffs
                         if (obj)
                         {
                             EliteVarietyAffixTinkererRecipientBehavior component = obj.GetComponent<EliteVarietyAffixTinkererRecipientBehavior>();
+                            if (!component) component = obj.AddComponent<EliteVarietyAffixTinkererRecipientBehavior>();
                             if (component)
                             {
                                 component.droneStatBonus = droneStatBonus;
@@ -302,14 +340,6 @@ namespace EliteVariety.Buffs
                         {
                             ItemTransferOrb item = ItemTransferOrb.DispatchItemTransferOrb(emitPosition, keyValuePair.Key, stolenItemInfo.itemIndex, stolenItemInfo.count, null, stolenItemInfo.ownerBodyNetworkIdentity);
                         }
-                    }
-                }
-
-                foreach (CharacterMaster droneMaster in droneMasters)
-                {
-                    if (droneMaster.inventory)
-                    {
-                        droneMaster.inventory.GiveItem(RoR2Content.Items.HealthDecay, 10);
                     }
                 }
 
