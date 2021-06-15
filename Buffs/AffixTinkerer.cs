@@ -204,6 +204,7 @@ namespace EliteVariety.Buffs
                     droneBody.mainHurtBox ? droneBody.mainHurtBox.transform : null
                 );
                 linkLines.Add(linkLineComponent);
+                NetworkServer.Spawn(linkLine);
             }
 
             public class EliteVarietyAffixTinkererRecipientBehavior : MonoBehaviour
