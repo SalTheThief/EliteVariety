@@ -47,13 +47,13 @@ namespace EliteVariety.CharacterBodies
             // body
             CharacterBody characterBody = prefab.GetComponent<CharacterBody>();
             characterBody.bodyFlags = CharacterBody.BodyFlags.Mechanical;
-            characterBody.baseMaxHealth = 75f;
+            characterBody.baseMaxHealth = 65f;
             characterBody.baseRegen = 3f;
             characterBody.baseMaxShield = 0f;
             characterBody.baseMoveSpeed = 17f;
             characterBody.baseAcceleration = 17f;
             characterBody.baseJumpPower = 0f;
-            characterBody.baseDamage = 6.5f;
+            characterBody.baseDamage = 9f;
             characterBody.baseAttackSpeed = 1f;
             characterBody.baseCrit = 0f;
             characterBody.baseArmor = 0f;
