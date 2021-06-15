@@ -42,7 +42,7 @@ namespace EliteVariety.Buffs
             BuffWard AddBuffWard()
             {
                 BuffWard newBuffWard = buffAuraPrefab.AddComponent<BuffWard>();
-                newBuffWard.radius = 20f;
+                newBuffWard.radius = 10f;
                 newBuffWard.interval = 0.5f;
                 newBuffWard.buffDuration = 0.7f;
                 newBuffWard.floorWard = false;
@@ -165,8 +165,8 @@ namespace EliteVariety.Buffs
         {
             public GameObject buffAura;
             public float specialWardDuration = 0f;
-            public float baseRadius = 20f;
-            public float extraRadius = 20f;
+            public float baseRadius = 13f;
+            public float extraRadius = 17f;
             public float extraRadiusDuration = 0f;
             public bool extraRadiusActive = false;
             public bool deathRadiusShrunk = false;

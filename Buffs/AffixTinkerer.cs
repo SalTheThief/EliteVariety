@@ -49,7 +49,7 @@ namespace EliteVariety.Buffs
 
         public static int GetTinkererDroneDeployableSameSlotLimit(CharacterMaster self, int deployableCountMultiplier)
         {
-            return 1 * deployableCountMultiplier;
+            return 2 + (int)(self.hasBody ? self.GetBody().radius : 0) * deployableCountMultiplier;
         }
 
         public override void AfterContentPackLoaded()

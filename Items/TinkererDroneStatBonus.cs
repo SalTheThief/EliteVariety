@@ -53,7 +53,7 @@ namespace EliteVariety.Items
             });
             CharacterStats.attackSpeedModifiers.Add(new CharacterStats.StatModifier
             {
-                flat = 0.05f,
+                flat = 0.1f,
                 times = (genericCharacterInfo) => TinkererDroneStatBonusModifierTimes(genericCharacterInfo)
             });
             CharacterStats.cooldownModifiers.Add(new CharacterStats.StatModifier
@@ -63,7 +63,7 @@ namespace EliteVariety.Items
             });
             CharacterStats.damageModifiers.Add(new CharacterStats.StatModifier
             {
-                multiplier = 0.05f,
+                multiplier = 0.1f,
                 times = (genericCharacterInfo) => TinkererDroneStatBonusModifierTimes(genericCharacterInfo)
             });
             CharacterStats.healthModifiers.Add(new CharacterStats.StatModifier

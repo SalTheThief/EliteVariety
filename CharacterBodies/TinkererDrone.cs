@@ -47,13 +47,13 @@ namespace EliteVariety.CharacterBodies
             // body
             CharacterBody characterBody = prefab.GetComponent<CharacterBody>();
             characterBody.bodyFlags = CharacterBody.BodyFlags.Mechanical;
-            characterBody.baseMaxHealth = 200f;
+            characterBody.baseMaxHealth = 75f;
             characterBody.baseRegen = 3f;
             characterBody.baseMaxShield = 0f;
             characterBody.baseMoveSpeed = 17f;
             characterBody.baseAcceleration = 17f;
             characterBody.baseJumpPower = 0f;
-            characterBody.baseDamage = 12f;
+            characterBody.baseDamage = 6.5f;
             characterBody.baseAttackSpeed = 1f;
             characterBody.baseCrit = 0f;
             characterBody.baseArmor = 0f;
@@ -415,7 +415,7 @@ namespace EliteVariety.CharacterBodies
             public static GameObject hitEffectPrefab;
             public static float damageCoefficient = 2f;
             public static float force = 2000f;
-            public static float laserRadius = 0.7f;
+            public static float laserRadius = 0.6f;
             public static float procCoefficient = 1f;
 
             public float duration;
@@ -428,7 +428,7 @@ namespace EliteVariety.CharacterBodies
                 duration = baseDuration / attackSpeedStat;
                 Ray modifiedAimRay = GetAimRay();
                 modifiedAimRay.direction = calculatedAimDirection;
-                Util.PlaySound(attackSoundString, gameObject);
+                Util.PlayAttackSpeedSound(attackSoundString, gameObject, attackSpeedStat);
                 if (characterBody)
                 {
                     characterBody.SetAimTimer(2f);
