@@ -18,7 +18,7 @@ Adds 6 new elite types! Supports [Aspect Abilities](https://thunderstore.io/pack
 ![](https://i.imgur.com/5Le5nhZ.png)
 
 ---
-###### Tinkering - spawns with a Tinkerer's Drone that becomes stronger with the amount of Item Scrap in the inventory. Chance to steal one of the target's items and convert it into Item Scrap on hit (stolen items are returned on death). On use: heal all ally drones.
+###### Tinkering - spawns up to 3 Tinkerer's Drones every few seconds that become stronger with the amount of Item Scrap in the inventory. Chance to steal one of the target's items and convert it into Item Scrap on hit (stolen items are returned on death). On use: heal all ally drones.
 ![](https://i.imgur.com/Y2TIUEJ.png)
 
 ---
