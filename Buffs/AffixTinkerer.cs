@@ -307,7 +307,10 @@ namespace EliteVariety.Buffs
 
                 foreach (CharacterMaster droneMaster in droneMasters)
                 {
-                    droneMaster.TrueKill();
+                    if (droneMaster.inventory)
+                    {
+                        droneMaster.inventory.GiveItem(RoR2Content.Items.HealthDecay, 10);
+                    }
                 }
 
                 if (droneSpawner != null) droneSpawner.Dispose();
