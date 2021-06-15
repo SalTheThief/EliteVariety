@@ -326,11 +326,6 @@ namespace EliteVariety.Buffs
 
                 if (droneSpawner != null) droneSpawner.Dispose();
                 droneSpawner = null;
-
-                foreach (EliteVarietyAffixTinkererLinkLine linkLine in linkLines)
-                {
-                    Object.Destroy(linkLine.gameObject);
-                }
             }
 
             public void StealFrom(Inventory inventory, Vector3 emitPosition, NetworkIdentity networkIdentity)
