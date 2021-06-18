@@ -189,7 +189,8 @@ namespace EliteVariety.Buffs
                     if (droneMaster && droneMaster.inventory)
                     {
                         droneMaster.inventory.GiveItem(EliteVarietyContent.Items.TinkererDroneStatBonus);
-                        droneMaster.gameObject.AddComponent<EliteVarietyAffixTinkererRecipientBehavior>();
+                        EliteVarietyAffixTinkererRecipientBehavior recipientBehavior = droneMaster.gameObject.AddComponent<EliteVarietyAffixTinkererRecipientBehavior>();
+                        recipientBehavior.ownerMaster = body.master;
                     }
                     droneMaster.onBodyStart += DroneMaster_onBodyStart;
                 }
@@ -226,7 +227,7 @@ namespace EliteVariety.Buffs
                     }
                 }
                 public Inventory inventory;
-                public MinionOwnership minionOwnership;
+                public CharacterMaster ownerMaster;
                 public int healthDecaysGained = 0;
                 public static int globalHealthDecaysToGiveOnOwnerLost = 10;
 
@@ -236,15 +237,14 @@ namespace EliteVariety.Buffs
                     if (master)
                     {
                         inventory = master.inventory;
-                        minionOwnership = master.minionOwnership;
                     }
                 }
 
                 public void FixedUpdate()
                 {
-                    if (NetworkServer.active && minionOwnership)
+                    if (NetworkServer.active)
                     {
-                        if (minionOwnership.ownerMaster)
+                        if (ownerMaster)
                         {
                             if (healthDecaysGained != 0)
                             {
