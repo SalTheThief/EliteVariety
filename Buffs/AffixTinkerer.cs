@@ -99,7 +99,7 @@ namespace EliteVariety.Buffs
                     _linkLines = value;
                 }
             }
-            public bool ownerIsTinkering = false;
+            public bool isDrone = false;
 
             public class StolenItemInfo
             {
@@ -115,10 +115,7 @@ namespace EliteVariety.Buffs
                 droneMasters = new List<CharacterMaster>();
                 linkLines = new List<EliteVarietyAffixTinkererLinkLine>();
 
-                if (body && body.master && body.master.minionOwnership && body.master.minionOwnership.ownerMaster && body.master.minionOwnership.ownerMaster.hasBody)
-                {
-                    ownerIsTinkering = body.master.minionOwnership.ownerMaster.GetBody().HasBuff(EliteVarietyContent.Buffs.AffixTinkerer);
-                }
+                isDrone = body.bodyIndex == BodyCatalog.FindBodyIndex("EliteVariety_TinkererDroneBody");
             }
 
             public void FixedUpdate()
@@ -127,7 +124,7 @@ namespace EliteVariety.Buffs
                 {
                     if (body.master)
                     {
-                        if (droneSpawner == null && !ownerIsTinkering)
+                        if (droneSpawner == null && !isDrone)
                         {
                             droneSpawner = new DeployableMinionSpawner(body.master, deployableSlot, new Xoroshiro128Plus(Run.instance.seed ^ (ulong)GetInstanceID()))
                             {
