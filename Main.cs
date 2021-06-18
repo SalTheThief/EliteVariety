@@ -231,6 +231,7 @@ namespace EliteVariety
 
         public static class Items
         {
+            public static ItemDef AllItemDisplaysItem;
             public static ItemDef TinkererDroneStatBonus;
         }
 
