@@ -39,7 +39,7 @@ namespace EliteVariety.Buffs
 
             Utils.CopyChildren(Main.AssetBundle.LoadAsset<GameObject>("Assets/EliteVariety/Elites/Sandstorm/Sandstorm.prefab"), sandstormPrefab);
             NetworkedBodyAttachment networkedBodyAttachment = sandstormPrefab.AddComponent<NetworkedBodyAttachment>();
-            networkedBodyAttachment.shouldParentToAttachedBody = true;
+            networkedBodyAttachment.shouldParentToAttachedBody = false;
             networkedBodyAttachment.forceHostAuthority = true;
             TeamFilter teamFilter = sandstormPrefab.AddComponent<TeamFilter>();
             EliteVarietySandstormBehavior sandstormBehavior = sandstormPrefab.AddComponent<EliteVarietySandstormBehavior>();
@@ -140,6 +140,7 @@ namespace EliteVariety.Buffs
 
             public float damage = 0.1f;
             public float dashDamage = 0.2f;
+            public Transform cachedTransform;
             public float procCoefficient = 0.25f;
             public float dashProcCoefficient = 1f;
             public Vector3 force = Vector3.zero;
@@ -187,6 +188,7 @@ namespace EliteVariety.Buffs
                 bodiesHitThisTick = new List<CharacterBody>();
                 materialPropertyBlock = new MaterialPropertyBlock();
                 indicatorRendererRecolorInfos = new List<IndicatorRendererRecolorInfo>();
+                cachedTransform = transform;
             }
 
             public void Start()
@@ -205,6 +207,13 @@ namespace EliteVariety.Buffs
                             changedColor = changedColor
                         });
                     }
+                }
+            }
+
+            public void LateUpdate()
+            {
+                if (cachedTransform && networkedBodyAttachment.attachedBodyObject) {
+                    cachedTransform.position = networkedBodyAttachment.attachedBodyObject.transform.position;
                 }
             }
 
