@@ -138,9 +138,10 @@ namespace EliteVariety.Buffs
             public Transform indicator;
             public Transform collision;
 
-            public float damage = 0.1f;
-            public float dashDamage = 0.2f;
             public Transform cachedTransform;
+
+            public float damage = 2.4f;
+            public float dashDamage = 9f;
             public float procCoefficient = 0.25f;
             public float dashProcCoefficient = 1f;
             public Vector3 force = Vector3.zero;
@@ -241,7 +242,7 @@ namespace EliteVariety.Buffs
             {
                 if (!NetworkServer.active || !networkedBodyAttachment || !networkedBodyAttachment.attachedBody || !networkedBodyAttachment.attachedBodyObject) return;
 
-                float currentTickDamage = (!dashActive ? damage : dashDamage) * networkedBodyAttachment.attachedBody.damage;
+                float currentTickDamage = !dashActive ? damage : dashDamage;
                 bool currentTickCrit = networkedBodyAttachment.attachedBody.RollCrit();
                 Vector3 currentTickForce = !dashActive ? force : dashForce;
                 Vector3 alignedForce = transform.forward * currentTickForce.x + transform.up * currentTickForce.y + transform.right * currentTickForce.z;
@@ -324,6 +325,10 @@ namespace EliteVariety.Buffs
             public void OnAttachedBodyDiscovered(NetworkedBodyAttachment networkedBodyAttachment, CharacterBody attachedBody)
             {
                 transform.position = attachedBody.footPosition;
+
+                float damageMultiplier = 1f + 0.2f * (attachedBody.level - 1);
+                damage *= damageMultiplier;
+                dashDamage *= damageMultiplier;
             }
 
             public class SyncRadius : INetMessage
