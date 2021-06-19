@@ -117,12 +117,30 @@ namespace EliteVariety.Equipment
             EliteVarietyContent.Resources.effectPrefabs.Add(itemAcquiredOrbEffect);
 
             onUseEffect = Resources.Load<GameObject>("Prefabs/Effects/MoneyPackPickupEffect");
+
+            On.RoR2.Language.GetLocalizedStringByToken += Language_GetLocalizedStringByToken;
         }
 
         public override void AfterContentPackLoaded()
         {
             base.AfterContentPackLoaded();
             equipmentDef.passiveBuffDef = EliteVarietyContent.Buffs.AffixPillaging;
+        }
+
+        private static string Language_GetLocalizedStringByToken(On.RoR2.Language.orig_GetLocalizedStringByToken orig, Language self, string token)
+        {
+            string localizedString = orig(self, token);
+
+            string chestCostReplacementToken = "ELITEVARIETY_PILLAGING_COST";
+            if (localizedString.Contains(chestCostReplacementToken))
+            {
+                int cost = 25;
+                if (EliteVarietyAffixPillagingNetworkedCost.instance) cost = EliteVarietyAffixPillagingNetworkedCost.instance.costSmallChest;
+
+                localizedString = localizedString.Replace(chestCostReplacementToken, cost.ToString());
+            }
+
+            return localizedString;
         }
 
         public override void AspectAbilitiesSupport()
@@ -132,25 +150,28 @@ namespace EliteVariety.Equipment
                 equipmentDef = equipmentDef,
                 onUseOverride = (equipmentSlot) =>
                 {
-                    if (EliteVarietyAffixPillagingNetworkedCost.instance && equipmentSlot.characterBody.master && equipmentSlot.characterBody.master.money > 0)
+                    if (EliteVarietyAffixPillagingNetworkedCost.instance && equipmentSlot.characterBody.master && equipmentSlot.characterBody.master.money >= EliteVarietyAffixPillagingNetworkedCost.instance.costSmallChest)
                     {
                         CostTypeDef costTypeDef = CostTypeCatalog.GetCostTypeDef(CostTypeIndex.Money);
                         if (costTypeDef != null)
                         {
                             Interactor interactor = equipmentSlot.characterBody.GetComponent<Interactor>();
                             if (interactor) {
-                                uint goldToSpend = (uint)Mathf.Max(equipmentSlot.characterBody.master.money * 0.5f, 1u);
+                                uint goldToSpend = (uint)Mathf.Max(equipmentSlot.characterBody.master.money, 1u);
                                 if (equipmentSlot.characterBody.master.money >= goldToSpend)
                                 {
                                     Dictionary<ItemIndex, int> itemsToGive = new Dictionary<ItemIndex, int>();
                                     
                                     WeightedSelection<List<PickupIndex>> weightedSelection = new WeightedSelection<List<PickupIndex>>(3);
-                                    int costScale = EliteVarietyAffixPillagingNetworkedCost.instance.cost;
+                                    float costScale = (float)EliteVarietyAffixPillagingNetworkedCost.instance.cost;
                                     weightedSelection.AddChoice(Run.instance.availableTier1DropList, 80f);
-                                    weightedSelection.AddChoice(Run.instance.availableTier2DropList, 20f * (goldToSpend / (200u / costScale)));
-                                    weightedSelection.AddChoice(Run.instance.availableTier3DropList, 1f * (goldToSpend / (50u / costScale)));
+                                    weightedSelection.AddChoice(Run.instance.availableTier2DropList, 80f * ((float)goldToSpend / (200f * costScale))); // green item weight is 20 when spending $50
+                                    weightedSelection.AddChoice(Run.instance.availableTier3DropList, 0.125f * ((float)goldToSpend / (50f * costScale))); // red item weight is 1 when spending $400
 
                                     costTypeDef.PayCost((int)goldToSpend, interactor, equipmentSlot.gameObject, RoR2Application.rng, ItemIndex.None);
+
+                                    Buffs.AffixPillaging.EliteVarietyAffixPillagingDeathRewardsModifier deathRewardsModifier = equipmentSlot.characterBody.GetComponent<Buffs.AffixPillaging.EliteVarietyAffixPillagingDeathRewardsModifier>();
+                                    if (deathRewardsModifier) deathRewardsModifier.goldStolenFromMe += goldToSpend; // keep same death rewards
 
                                     int itemsToGet = 1;
                                     for (var i = 0; i < itemsToGet; i++)
@@ -190,7 +211,8 @@ namespace EliteVariety.Equipment
 
         public class EliteVarietyAffixPillagingNetworkedCost : MonoBehaviour
         {
-            public int cost;
+            public int cost = 1;
+            public int costSmallChest = 25;
             public static EliteVarietyAffixPillagingNetworkedCost instance;
 
             public void Awake()
@@ -202,7 +224,8 @@ namespace EliteVariety.Equipment
                     if (Run.instance)
                     {
                         cost = Run.instance.GetDifficultyScaledCost(1);
-                        new SyncScaling(cost).Send(NetworkDestination.Clients);
+                        costSmallChest = Run.instance.GetDifficultyScaledCost(25);
+                        new SyncScaling(cost, costSmallChest).Send(NetworkDestination.Clients);
                     }
                 }
             }
@@ -210,19 +233,22 @@ namespace EliteVariety.Equipment
             public class SyncScaling : INetMessage
             {
                 int cost;
+                int costSmallChest;
 
                 public SyncScaling()
                 {
                 }
 
-                public SyncScaling(int cost)
+                public SyncScaling(int cost, int costSmallChest)
                 {
                     this.cost = cost;
+                    this.costSmallChest = costSmallChest;
                 }
 
                 public void Deserialize(NetworkReader reader)
                 {
                     cost = reader.ReadInt32();
+                    costSmallChest = reader.ReadInt32();
                 }
 
                 public void OnReceived()
@@ -234,11 +260,13 @@ namespace EliteVariety.Equipment
                         EliteVarietyAffixPillagingNetworkedCost.instance = Object.Instantiate<GameObject>(networkedCostPrefab).GetComponent<EliteVarietyAffixPillagingNetworkedCost>();
                     }
                     EliteVarietyAffixPillagingNetworkedCost.instance.cost = cost;
+                    EliteVarietyAffixPillagingNetworkedCost.instance.costSmallChest = costSmallChest;
                 }
 
                 public void Serialize(NetworkWriter writer)
                 {
                     writer.Write(cost);
+                    writer.Write(costSmallChest);
                 }
             }
         }
