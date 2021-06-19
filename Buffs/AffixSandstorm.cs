@@ -391,6 +391,7 @@ namespace EliteVariety.Buffs
             public float acceleration = 200f;
             public bool directionLock = true;
             public Vector3 direction;
+            public bool passengerIsFlying = false;
 
             public bool aiControlled = false;
             public Vector3 aiTargetPosition;
@@ -422,8 +423,8 @@ namespace EliteVariety.Buffs
                             chosenDirection = originalAimRay.direction;
                         }
                         rigidbody.MoveRotation(Quaternion.LookRotation(chosenDirection));
-                        Vector3 targetVelocity = new Vector3(chosenDirection.x, 0f, chosenDirection.z) * speed * Mathf.Max(vehicleSeat.currentPassengerBody.moveSpeed / 7f, 1f);
-                        Vector3 currentVelocity = new Vector3(rigidbody.velocity.x, 0f, rigidbody.velocity.z);
+                        Vector3 targetVelocity = new Vector3(chosenDirection.x, passengerIsFlying ? chosenDirection.y : 0f, chosenDirection.z) * speed * Mathf.Max(vehicleSeat.currentPassengerBody.moveSpeed / 7f, 1f);
+                        Vector3 currentVelocity = new Vector3(rigidbody.velocity.x, passengerIsFlying ? rigidbody.velocity.y : 0f, rigidbody.velocity.z);
                         Vector3 velocityChange = Vector3.MoveTowards(currentVelocity, targetVelocity, acceleration * Time.fixedDeltaTime);
                         rigidbody.AddForce(velocityChange - currentVelocity, ForceMode.VelocityChange);
 
@@ -470,6 +471,8 @@ namespace EliteVariety.Buffs
                 rigidbody.rotation = Quaternion.LookRotation(aimDirection);
                 rigidbody.velocity = aimDirection * initialSpeed * Mathf.Max(passengerBody.moveSpeed / 7f, 1f);
                 direction = aimDirection;
+                passengerIsFlying = passengerBody.isFlying;
+                if (passengerIsFlying) rigidbody.useGravity = false;
                 if (NetworkServer.active) passengerBody.AddBuff(RoR2Content.Buffs.ArmorBoost);
                 transform.localScale = new Vector3(passengerBody.bestFitRadius, passengerBody.bestFitRadius, passengerBody.bestFitRadius);
 
