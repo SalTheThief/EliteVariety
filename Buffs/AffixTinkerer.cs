@@ -45,6 +45,26 @@ namespace EliteVariety.Buffs
             linkLineComponent.endVelocity = new Vector3(0f, -5f, 0f);
 
             deployableSlot = R2API.DeployableAPI.RegisterDeployableSlot(GetTinkererDroneDeployableSameSlotLimit);
+
+            On.RoR2.CharacterBody.AddBuff_BuffIndex += CharacterBody_AddBuff_BuffIndex;
+            On.RoR2.CharacterBody.AddTimedBuff_BuffDef_float += CharacterBody_AddTimedBuff_BuffDef_float;
+        }
+
+        public static bool IsBodyTinkererDrone(CharacterBody body)
+        {
+            return body.bodyIndex == BodyCatalog.FindBodyIndex("EliteVariety_TinkererDroneBody");
+        }
+
+        private void CharacterBody_AddBuff_BuffIndex(On.RoR2.CharacterBody.orig_AddBuff_BuffIndex orig, CharacterBody self, BuffIndex buffType)
+        {
+            if (buffType == buffDef.buffIndex && IsBodyTinkererDrone(self)) buffType = BuffIndex.None;
+            orig(self, buffType);
+        }
+
+        private void CharacterBody_AddTimedBuff_BuffDef_float(On.RoR2.CharacterBody.orig_AddTimedBuff_BuffDef_float orig, CharacterBody self, BuffDef buffDef, float duration)
+        {
+            if (buffDef == this.buffDef && IsBodyTinkererDrone(self)) return;
+            orig(self, buffDef, duration);
         }
 
         public static int GetTinkererDroneDeployableSameSlotLimit(CharacterMaster self, int deployableCountMultiplier)
@@ -115,7 +135,7 @@ namespace EliteVariety.Buffs
                 droneMasters = new List<CharacterMaster>();
                 linkLines = new List<EliteVarietyAffixTinkererLinkLine>();
 
-                isDrone = body.bodyIndex == BodyCatalog.FindBodyIndex("EliteVariety_TinkererDroneBody");
+                isDrone = IsBodyTinkererDrone(body);
             }
 
             public void FixedUpdate()
