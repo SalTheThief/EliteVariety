@@ -7,6 +7,7 @@ using UnityEngine.Networking;
 using R2API.Networking.Interfaces;
 using R2API.Networking;
 using RoR2.Orbs;
+using System.Linq;
 
 namespace EliteVariety.Equipment
 {
@@ -143,6 +144,39 @@ namespace EliteVariety.Equipment
             return localizedString;
         }
 
+        public static readonly ItemTag[] aiForbiddenTags = new ItemTag[]
+        {
+            ItemTag.AIBlacklist,
+            ItemTag.SprintRelated,
+            ItemTag.OnKillEffect
+        };
+
+        public static bool IsItemAllowedForMonsters(ItemDef itemDef)
+        {
+            for (int i = 0; i < aiForbiddenTags.Length; i++)
+            {
+                if (itemDef.ContainsTag(aiForbiddenTags[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static List<ItemIndex> GeneratePillagingItemDropList(List<PickupIndex> tierDropList, TeamIndex teamIndex)
+        {
+            IEnumerable<ItemDef> itemDefs = tierDropList.Select(x =>
+            {
+                PickupDef pickupDef = PickupCatalog.GetPickupDef(x);
+                if (pickupDef == null) return null;
+                return ItemCatalog.GetItemDef(pickupDef.itemIndex);
+            }).Where(x => x != null);
+
+            if (teamIndex == TeamIndex.Monster) itemDefs = itemDefs.Where(IsItemAllowedForMonsters);
+
+            return itemDefs.Select(x => x.itemIndex).ToList();
+        }
+
         public override void AspectAbilitiesSupport()
         {
             AspectAbilities.AspectAbilitiesPlugin.RegisterAspectAbility(new AspectAbilities.AspectAbility
@@ -162,11 +196,12 @@ namespace EliteVariety.Equipment
                                 {
                                     Dictionary<ItemIndex, int> itemsToGive = new Dictionary<ItemIndex, int>();
                                     
-                                    WeightedSelection<List<PickupIndex>> weightedSelection = new WeightedSelection<List<PickupIndex>>(3);
+                                    WeightedSelection<List<ItemIndex>> weightedSelection = new WeightedSelection<List<ItemIndex>>(3);
                                     float costScale = (float)EliteVarietyAffixPillagingNetworkedCost.instance.cost;
-                                    weightedSelection.AddChoice(Run.instance.availableTier1DropList, 80f);
-                                    weightedSelection.AddChoice(Run.instance.availableTier2DropList, 80f * ((float)goldToSpend / (200f * costScale))); // green item weight is 20 when spending $50
-                                    weightedSelection.AddChoice(Run.instance.availableTier3DropList, 0.125f * ((float)goldToSpend / (50f * costScale))); // red item weight is 1 when spending $400
+                                    TeamIndex teamIndex = TeamComponent.GetObjectTeam(equipmentSlot.gameObject);
+                                    weightedSelection.AddChoice(GeneratePillagingItemDropList(Run.instance.availableTier1DropList, teamIndex), 80f);
+                                    weightedSelection.AddChoice(GeneratePillagingItemDropList(Run.instance.availableTier2DropList, teamIndex), 80f * ((float)goldToSpend / (200f * costScale))); // green item weight is 20 when spending $50
+                                    weightedSelection.AddChoice(GeneratePillagingItemDropList(Run.instance.availableTier3DropList, teamIndex), 0.125f * ((float)goldToSpend / (50f * costScale))); // red item weight is 1 when spending $400
 
                                     costTypeDef.PayCost((int)goldToSpend, interactor, equipmentSlot.gameObject, RoR2Application.rng, ItemIndex.None);
 
@@ -176,9 +211,8 @@ namespace EliteVariety.Equipment
                                     int itemsToGet = 1;
                                     for (var i = 0; i < itemsToGet; i++)
                                     {
-                                        PickupIndex pickupIndex = RoR2Application.rng.NextElementUniform(weightedSelection.Evaluate(RoR2Application.rng.nextNormalizedFloat));
-                                        ItemIndex itemIndex = PickupCatalog.GetPickupDef(pickupIndex).itemIndex;
-
+                                        ItemIndex itemIndex = RoR2Application.rng.NextElementUniform(weightedSelection.Evaluate(RoR2Application.rng.nextNormalizedFloat));
+                                        
                                         if (!itemsToGive.ContainsKey(itemIndex)) itemsToGive.Add(itemIndex, 0);
                                         itemsToGive[itemIndex]++;
                                     }
