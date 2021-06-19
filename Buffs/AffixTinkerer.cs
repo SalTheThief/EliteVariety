@@ -334,20 +334,6 @@ namespace EliteVariety.Buffs
             {
                 orbsInFlight.ForEach(x => OrbManager.instance.ForceImmediateArrival(x));
 
-                Vector3 emitPosition = transform.position;
-                if (body) emitPosition = body.corePosition;
-
-                foreach (KeyValuePair<Inventory, List<StolenItemInfo>> keyValuePair in stealDictionary)
-                {
-                    if (keyValuePair.Key)
-                    {
-                        foreach (StolenItemInfo stolenItemInfo in keyValuePair.Value)
-                        {
-                            ItemTransferOrb item = ItemTransferOrb.DispatchItemTransferOrb(emitPosition, keyValuePair.Key, stolenItemInfo.itemIndex, stolenItemInfo.count, null, stolenItemInfo.ownerBodyNetworkIdentity);
-                        }
-                    }
-                }
-
                 if (droneSpawner != null) droneSpawner.Dispose();
                 droneSpawner = null;
             }
@@ -359,7 +345,7 @@ namespace EliteVariety.Buffs
                 {
                     ItemDef itemDef = ItemCatalog.GetItemDef(itemIndex);
                     if (itemDef) {
-                        if (itemDef.canRemove && itemDef.DoesNotContainTag(ItemTag.CannotSteal) && inventory.GetItemCount(itemIndex) > 0)
+                        if (itemDef.canRemove && itemDef.DoesNotContainTag(ItemTag.CannotSteal) && itemDef.ContainsTag(ItemTag.Scrap) && inventory.GetItemCount(itemIndex) > 0)
                         {
                             itemsThatCanBeStolen.Add(itemIndex);
                         }
@@ -371,24 +357,6 @@ namespace EliteVariety.Buffs
                     ItemDef itemToStealDef = ItemCatalog.GetItemDef(itemToSteal);
                     int stealAmount = 1;
                     inventory.RemoveItem(itemToSteal, stealAmount);
-
-                    ItemDef scrap = RoR2Content.Items.ScrapWhite;
-                    switch (itemToStealDef.tier)
-                    {
-                        case ItemTier.Tier1:
-                            scrap = RoR2Content.Items.ScrapWhite;
-                            break;
-                        case ItemTier.Tier2:
-                            scrap = RoR2Content.Items.ScrapGreen;
-                            break;
-                        case ItemTier.Boss:
-                            scrap = RoR2Content.Items.ScrapYellow;
-                            break;
-                        case ItemTier.Tier3:
-                            scrap = RoR2Content.Items.ScrapRed;
-                            break;
-                    }
-                    ItemIndex scrapIndex = scrap.itemIndex;
 
                     if (!stealDictionary.ContainsKey(inventory)) stealDictionary.Add(inventory, new List<StolenItemInfo>());
                     StolenItemInfo stolenItemInfo = stealDictionary[inventory].FirstOrDefault(x => x.itemIndex == itemToSteal);
@@ -405,20 +373,8 @@ namespace EliteVariety.Buffs
 
                     ItemTransferOrb item = ItemTransferOrb.DispatchItemTransferOrb(emitPosition, null, itemToSteal, stealAmount, (orb) =>
                     {
-                        body.inventory.GiveItem(scrap, stealAmount);
+                        body.inventory.GiveItem(itemToSteal, stealAmount);
                         orbsInFlight.Remove(orb);
-
-                        foreach (CharacterMaster droneMaster in droneMasters)
-                        {
-                            CharacterBody droneBody = droneMaster.GetBody();
-                            if (droneBody)
-                            {
-                                ItemTransferOrb item2 = ItemTransferOrb.DispatchItemTransferOrb(body.corePosition, null, scrapIndex, stealAmount, (orb2) =>
-                                {
-                                    orbsInFlight.Remove(orb2);
-                                }, droneBody.networkIdentity);
-                            }
-                        }
                     }, body.networkIdentity);
                     orbsInFlight.Add(item);
                 }
