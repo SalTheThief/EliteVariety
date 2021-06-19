@@ -403,8 +403,10 @@ namespace EliteVariety.Buffs
             public float speed = 30f;
             public float selfDestructTimer = 3f;
             public float acceleration = 200f;
-            public bool directionLock = true;
+            public bool directionLock = false;
             public Vector3 direction;
+            private Vector3 directionSmoothVelocity;
+            public float directionSmoothTime = 0.5f;
             public bool passengerIsFlying = false;
 
             public bool aiControlled = false;
@@ -429,15 +431,14 @@ namespace EliteVariety.Buffs
 
                     if (vehicleSeat && vehicleSeat.currentPassengerInputBank && vehicleSeat.currentPassengerBody)
                     {
-                        Vector3 chosenDirection = direction;
                         if (!directionLock)
                         {
                             Ray originalAimRay = vehicleSeat.currentPassengerInputBank.GetAimRay();
                             originalAimRay = CameraRigController.ModifyAimRayIfApplicable(originalAimRay, gameObject, out _);
-                            chosenDirection = originalAimRay.direction;
+                            direction = Vector3.SmoothDamp(direction, originalAimRay.direction, ref directionSmoothVelocity, directionSmoothTime);
                         }
-                        rigidbody.MoveRotation(Quaternion.LookRotation(chosenDirection));
-                        Vector3 targetVelocity = new Vector3(chosenDirection.x, passengerIsFlying ? chosenDirection.y : 0f, chosenDirection.z) * speed * Mathf.Max(vehicleSeat.currentPassengerBody.moveSpeed / 7f, 1f);
+                        rigidbody.MoveRotation(Quaternion.LookRotation(direction));
+                        Vector3 targetVelocity = new Vector3(direction.x, passengerIsFlying ? direction.y : 0f, direction.z) * speed * Mathf.Max(vehicleSeat.currentPassengerBody.moveSpeed / 7f, 1f);
                         Vector3 currentVelocity = new Vector3(rigidbody.velocity.x, passengerIsFlying ? rigidbody.velocity.y : 0f, rigidbody.velocity.z);
                         Vector3 velocityChange = Vector3.MoveTowards(currentVelocity, targetVelocity, acceleration * Time.fixedDeltaTime);
                         rigidbody.AddForce(velocityChange - currentVelocity, ForceMode.VelocityChange);
