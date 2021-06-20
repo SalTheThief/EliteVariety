@@ -46,8 +46,8 @@ namespace EliteVariety.Buffs
             sandstormBehavior.colliderListComponent = sandstormPrefab.transform.Find("Collision").gameObject.AddComponent<MysticsRisky2Utils.MonoBehaviours.MysticsRisky2UtilsColliderTriggerList>();
             sandstormBehavior.indicator = sandstormPrefab.transform.Find("Indicator");
             sandstormBehavior.collision = sandstormPrefab.transform.Find("Collision");
-            sandstormPrefab.transform.Find("Collision").gameObject.layer = LayerIndex.world.intVal;
             sandstormPrefab.gameObject.layer = LayerIndex.fakeActor.intVal;
+            sandstormPrefab.transform.Find("Collision").gameObject.layer = LayerIndex.collideWithCharacterHullOnly.intVal;
 
             DestroyOnTimer destroyOnTimer = sandstormPrefab.transform.Find("Indicator").gameObject.AddComponent<DestroyOnTimer>();
             destroyOnTimer.duration = 10f;
