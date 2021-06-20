@@ -148,6 +148,7 @@ namespace EliteVariety.CharacterBodies
             EliteVarietyContent.Resources.entityStateTypes.Add(typeof(TinkererDroneSpawnState));
             EliteVarietyContent.Resources.entityStateTypes.Add(typeof(TinkererDroneChargeLaser));
             EliteVarietyContent.Resources.entityStateTypes.Add(typeof(TinkererDroneFireLaser));
+            EliteVarietyContent.Resources.entityStateTypes.Add(typeof(TinkererDroneLaserDowntime));
             EliteVarietyContent.Resources.entityStateTypes.Add(typeof(TinkererDroneDeath));
 
             // skills
@@ -156,8 +157,8 @@ namespace EliteVariety.CharacterBodies
             skillFire.skillName = "Fire";
             skillFire.activationStateMachineName = "Weapon";
             skillFire.activationState = new EntityStates.SerializableEntityStateType(typeof(TinkererDroneChargeLaser));
-            skillFire.interruptPriority = EntityStates.InterruptPriority.Skill;
-            skillFire.baseRechargeInterval = 2f;
+            skillFire.interruptPriority = EntityStates.InterruptPriority.Any;
+            skillFire.baseRechargeInterval = 0f;
             skillFire.baseMaxStock = 1;
             skillFire.rechargeStock = 1;
             skillFire.requiredStock = 1;
@@ -472,6 +473,35 @@ namespace EliteVariety.CharacterBodies
                     };
                     bulletAttack.Fire();
                 }
+            }
+
+            public override void FixedUpdate()
+            {
+                base.FixedUpdate();
+                if (fixedAge >= duration && isAuthority)
+                {
+                    outer.SetNextState(new TinkererDroneLaserDowntime());
+                    return;
+                }
+            }
+
+            public override EntityStates.InterruptPriority GetMinimumInterruptPriority()
+            {
+                return EntityStates.InterruptPriority.Skill;
+            }
+        }
+
+        public class TinkererDroneLaserDowntime : EntityStates.BaseState
+        {
+            public static float baseDuration = 2f;
+
+            public float duration;
+
+            public override void OnEnter()
+            {
+                base.OnEnter();
+
+                duration = baseDuration / attackSpeedStat;
             }
 
             public override void FixedUpdate()
