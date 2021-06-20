@@ -501,7 +501,7 @@ namespace EliteVariety.CharacterBodies
 
         public class TinkererDroneSpawnState : EntityStates.BaseState
         {
-            public static float duration = 1.5f;
+            public static float duration = 2f;
             public static string spawnSoundString = "Play_drone_repair";
 
             public override void OnEnter()
