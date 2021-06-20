@@ -415,7 +415,7 @@ namespace EliteVariety.CharacterBodies
             public static GameObject hitEffectPrefab;
             public static float damageCoefficient = 3f;
             public static float force = 2000f;
-            public static float laserRadius = 0.6f;
+            public static float laserRadius = 0.1f;
             public static float procCoefficient = 1f;
 
             public float duration;
