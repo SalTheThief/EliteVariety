@@ -19,6 +19,7 @@ namespace EliteVariety.Buffs
     public class AffixImpPlane : BaseBuff
     {
         public static GameObject stareCameraEffect;
+        public static GameObject stareColliderPrefab;
         public static NetworkSoundEventDef impaleSound;
 
         public override Sprite LoadSprite(string assetName)
@@ -88,6 +89,9 @@ namespace EliteVariety.Buffs
                 radius = CustomTempVFXManagement.DefaultRadiusCall
             });
 
+            stareColliderPrefab = PrefabAPI.InstantiateClone(Main.AssetBundle.LoadAsset<GameObject>("Assets/EliteVariety/Elites/ImpPlane/StareCollider.prefab"), Main.TokenPrefix + "StareCollider", false);
+            stareColliderPrefab.transform.Find("Collider").gameObject.AddComponent<MysticsRisky2UtilsColliderTriggerList>();
+
             impaleSound = ScriptableObject.CreateInstance<NetworkSoundEventDef>();
             impaleSound.eventName = "EliteVariety_Play_erythrite_impale";
             EliteVarietyContent.Resources.networkSoundEventDefs.Add(impaleSound);
@@ -123,23 +127,27 @@ namespace EliteVariety.Buffs
             public CharacterBody body;
             public InputBankTest inputBank;
             public float stareTimer = 0f;
-            public float stareTimerDuration = 0.5f;
+            public float stareTimerDuration = 0.2f;
             public float buffDuration = 1f;
             public bool staring = false;
-            public BullseyeSearch bullseyeSearch;
+            public GameObject colliderObject;
+            public MysticsRisky2UtilsColliderTriggerList colliderTriggerList;
+            public Transform colliderTransform;
 
             public void Awake()
             {
                 body = GetComponent<CharacterBody>();
                 inputBank = GetComponent<InputBankTest>();
 
-                bullseyeSearch = new BullseyeSearch();
-                bullseyeSearch.minAngleFilter = 0f;
-                bullseyeSearch.maxAngleFilter = 10f;
-                bullseyeSearch.minDistanceFilter = 0f;
-                bullseyeSearch.maxDistanceFilter = 1000f;
-                bullseyeSearch.sortMode = BullseyeSearch.SortMode.DistanceAndAngle;
-                bullseyeSearch.filterByLoS = true;
+                colliderObject = Object.Instantiate(stareColliderPrefab);
+                colliderTransform = colliderObject.transform;
+                colliderTriggerList = colliderObject.GetComponentInChildren<MysticsRisky2UtilsColliderTriggerList>();
+                AdjustCollider(5f, 1000f);
+            }
+
+            public void AdjustCollider(float width, float length)
+            {
+                colliderTransform.localScale = new Vector3(width, width, length);
             }
 
             public void FixedUpdate()
@@ -168,24 +176,33 @@ namespace EliteVariety.Buffs
                 if (inputBank)
                 {
                     Ray aimRay = inputBank.GetAimRay();
-                    bullseyeSearch.searchOrigin = aimRay.origin;
-                    bullseyeSearch.searchDirection = aimRay.direction;
-                    bullseyeSearch.teamMaskFilter = TeamMask.GetUnprotectedTeams(TeamComponent.GetObjectTeam(gameObject));
-                    bullseyeSearch.RefreshCandidates();
-                    bullseyeSearch.FilterOutGameObject(gameObject);
-                    foreach (HurtBox hurtBox in bullseyeSearch.GetResults())
+                    aimRay = CameraRigController.ModifyAimRayIfApplicable(aimRay, gameObject, out _);
+
+                    colliderTransform.position = aimRay.origin;
+                    colliderTransform.rotation = Util.QuaternionSafeLookRotation(aimRay.direction, Vector3.up);
+
+                    foreach (Collider collider in colliderTriggerList.RetrieveList())
                     {
-                        if (hurtBox.healthComponent)
+                        CharacterBody characterBody = collider.GetComponent<CharacterBody>();
+                        if (characterBody && characterBody != body && characterBody.HasBuff(EliteVarietyContent.Buffs.AffixImpPlane))
                         {
-                            CharacterBody colliderBody = hurtBox.healthComponent.body;
-                            if (colliderBody && colliderBody.HasBuff(EliteVarietyContent.Buffs.AffixImpPlane))
+                            if (TeamComponent.GetObjectTeam(characterBody.gameObject) != TeamComponent.GetObjectTeam(gameObject))
                             {
-                                return true;
+                                if (characterBody.healthComponent && characterBody.healthComponent.alive)
+                                {
+                                    if (!Physics.Linecast(aimRay.origin, collider.transform.position, LayerIndex.world.mask, QueryTriggerInteraction.UseGlobal))
+                                        return true;
+                                }
                             }
                         }
                     }
                 }
                 return false;
+            }
+
+            public void OnDestroy()
+            {
+                Object.Destroy(colliderObject);
             }
         }
     }
