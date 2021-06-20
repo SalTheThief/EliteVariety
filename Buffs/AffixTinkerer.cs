@@ -48,6 +48,8 @@ namespace EliteVariety.Buffs
 
             On.RoR2.CharacterBody.AddBuff_BuffIndex += CharacterBody_AddBuff_BuffIndex;
             On.RoR2.CharacterBody.AddTimedBuff_BuffDef_float += CharacterBody_AddTimedBuff_BuffDef_float;
+
+            On.RoR2.Inventory.SetEquipmentInternal += Inventory_SetEquipmentInternal;
         }
 
         public static bool IsBodyTinkererDrone(CharacterBody body)
@@ -65,6 +67,16 @@ namespace EliteVariety.Buffs
         {
             if (buffDef == this.buffDef && IsBodyTinkererDrone(self)) return;
             orig(self, buffDef, duration);
+        }
+
+        private bool Inventory_SetEquipmentInternal(On.RoR2.Inventory.orig_SetEquipmentInternal orig, Inventory self, EquipmentState equipmentState, uint slot)
+        {
+            if (equipmentState.equipmentDef == EliteVarietyContent.Equipment.AffixTinkerer || equipmentState.equipmentIndex == EliteVarietyContent.Equipment.AffixTinkerer.equipmentIndex)
+            {
+                CharacterBody body = self.GetComponent<CharacterBody>();
+                if (body && IsBodyTinkererDrone(body)) equipmentState = EquipmentState.empty;
+            }
+            return orig(self, equipmentState, slot);
         }
 
         public static int GetTinkererDroneDeployableSameSlotLimit(CharacterMaster self, int deployableCountMultiplier)
