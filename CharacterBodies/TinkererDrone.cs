@@ -471,6 +471,34 @@ namespace EliteVariety.CharacterBodies
                         tracerEffectPrefab = tracerEffectPrefab,
                         weapon = gameObject
                     };
+                    bulletAttack.filterCallback = (ref BulletAttack.BulletHit hitInfo) =>
+                    {
+                        bool IsWorldLayerTriggerCollider(Transform transform)
+                        {
+                            return transform && transform.gameObject.name == "WorldLayerTriggerCollider" && transform.gameObject.layer == LayerIndex.world.intVal;
+                        }
+                        if (hitInfo.entityObject)
+                        {
+                            if (IsWorldLayerTriggerCollider(hitInfo.entityObject.transform)
+                            || IsWorldLayerTriggerCollider(hitInfo.entityObject.transform.Find("WorldLayerTriggerCollider")))
+                                return true;
+                        }
+                        return bulletAttack.DefaultFilterCallback(ref hitInfo);
+                    };
+                    bulletAttack.hitCallback = (ref BulletAttack.BulletHit hitInfo) =>
+                    {
+                        bool IsWorldLayerTriggerCollider(Transform transform)
+                        {
+                            return transform && transform.gameObject.name == "WorldLayerTriggerCollider" && transform.gameObject.layer == LayerIndex.world.intVal;
+                        }
+                        if (hitInfo.entityObject)
+                        {
+                            if (IsWorldLayerTriggerCollider(hitInfo.entityObject.transform)
+                            || IsWorldLayerTriggerCollider(hitInfo.entityObject.transform.Find("WorldLayerTriggerCollider")))
+                                return false;
+                        }
+                        return bulletAttack.DefaultHitCallback(ref hitInfo);
+                    };
                     bulletAttack.Fire();
                 }
             }
