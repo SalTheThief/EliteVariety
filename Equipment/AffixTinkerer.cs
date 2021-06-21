@@ -156,6 +156,11 @@ namespace EliteVariety.Equipment
                 aiMaxUseDistance = Mathf.Infinity,
                 onUseOverride = (equipmentSlot) =>
                 {
+                    if (Buffs.AffixTinkerer.IsBodyTinkererDrone(equipmentSlot.characterBody))
+                    {
+                        equipmentSlot.equipmentIndex = EquipmentIndex.None;
+                        return false;
+                    }
                     if (equipmentSlot.inventory)
                     {
                         foreach (TeamComponent teamMember in TeamComponent.GetTeamMembers(equipmentSlot.teamComponent.teamIndex))
