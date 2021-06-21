@@ -106,6 +106,7 @@ namespace EliteVariety.Buffs
             public List<CharacterMaster> droneMasters {
                 get
                 {
+                    if (_droneMasters == null) _droneMasters = new List<CharacterMaster>();
                     _droneMasters.RemoveAll(x => !x);
                     return _droneMasters;
                 }
@@ -344,7 +345,7 @@ namespace EliteVariety.Buffs
 
             public void OnDestroy()
             {
-                orbsInFlight.ForEach(x => OrbManager.instance.ForceImmediateArrival(x));
+                if (orbsInFlight != null) orbsInFlight.ForEach(x => OrbManager.instance.ForceImmediateArrival(x));
 
                 if (droneSpawner != null) droneSpawner.Dispose();
                 droneSpawner = null;
