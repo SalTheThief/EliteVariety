@@ -38,10 +38,10 @@
     //[ASPECT ABILITIES]
     "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXARMORED_PICKUP": "Gain temporary armor increase on use.",
     "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXBUFFING_PICKUP": "Increase banner radius on use.",
-    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXPILLAGING_PICKUP": "On use, spend half of your gold to gain a random item. The more gold spent, the higher chance of getting a rarer item.",
+    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXPILLAGING_PICKUP": "On use, spend all of your gold (min. $ELITEVARIETY_PILLAGING_COST) for random item. The more gold spent, the higher chance of getting a rarer item.",
     "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXSANDSTORM_PICKUP": "Dash on use, knocking nearby enemies up.",
     "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXTINKERER_PICKUP": "Heal drones on use.",
-    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXIMPPLANE_PICKUP": "Summon the Imp Overlord on use.",
+    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXIMPPLANE_PICKUP": "Teleport to a target and deal damage on use.",
 
     //[CUSTOM]
     "ELITEVARIETY_SANDSTORM_VEHICLE_EXIT_CONTEXT": "Cancel dash"
@@ -85,10 +85,10 @@
     //[ASPECT ABILITIES]
     "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXARMORED_PICKUP": "Получите временное повышение брони при использовании.",
     "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXBUFFING_PICKUP": "Увеличивает радиус стяга при использовании.",
-    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXPILLAGING_PICKUP": "При использовании потратьте половину золота и получите случайный предмет. Чем больше золота потрачено, тем выше шанс получить более редкий предмет.",
+    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXPILLAGING_PICKUP": "При использовании потратьте всё золото (мин. $ELITEVARIETY_PILLAGING_COST) и получите случайный предмет. Чем больше золота потрачено, тем выше шанс получить более редкий предмет.",
     "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXSANDSTORM_PICKUP": "При использовании совершает рывок, подбрасывая близжайших врагов.",
     "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXTINKERER_PICKUP": "Лечит дронов при использовании.",
-    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXIMPPLANE_PICKUP": "Призывает Владыку бесов при использовании.",
+    "ASPECTABILITIES_EQUIPMENT_ELITEVARIETY_AFFIXIMPPLANE_PICKUP": "Телепортирует к цели и наносит урон при использовании.",
 
     //[CUSTOM]
     "ELITEVARIETY_SANDSTORM_VEHICLE_EXIT_CONTEXT": "Прекратить рывок"

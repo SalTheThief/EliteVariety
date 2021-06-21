@@ -45,6 +45,38 @@ namespace EliteVariety.Buffs
             linkLineComponent.endVelocity = new Vector3(0f, -5f, 0f);
 
             deployableSlot = R2API.DeployableAPI.RegisterDeployableSlot(GetTinkererDroneDeployableSameSlotLimit);
+
+            On.RoR2.CharacterBody.AddBuff_BuffIndex += CharacterBody_AddBuff_BuffIndex;
+            On.RoR2.CharacterBody.AddTimedBuff_BuffDef_float += CharacterBody_AddTimedBuff_BuffDef_float;
+
+            On.RoR2.Inventory.SetEquipmentInternal += Inventory_SetEquipmentInternal;
+        }
+
+        public static bool IsBodyTinkererDrone(CharacterBody body)
+        {
+            return body.bodyIndex == BodyCatalog.FindBodyIndex("EliteVariety_TinkererDroneBody");
+        }
+
+        private void CharacterBody_AddBuff_BuffIndex(On.RoR2.CharacterBody.orig_AddBuff_BuffIndex orig, CharacterBody self, BuffIndex buffType)
+        {
+            if (buffType == buffDef.buffIndex && IsBodyTinkererDrone(self)) buffType = BuffIndex.None;
+            orig(self, buffType);
+        }
+
+        private void CharacterBody_AddTimedBuff_BuffDef_float(On.RoR2.CharacterBody.orig_AddTimedBuff_BuffDef_float orig, CharacterBody self, BuffDef buffDef, float duration)
+        {
+            if (buffDef == this.buffDef && IsBodyTinkererDrone(self)) return;
+            orig(self, buffDef, duration);
+        }
+
+        private bool Inventory_SetEquipmentInternal(On.RoR2.Inventory.orig_SetEquipmentInternal orig, Inventory self, EquipmentState equipmentState, uint slot)
+        {
+            if (equipmentState.equipmentDef == EliteVarietyContent.Equipment.AffixTinkerer || equipmentState.equipmentIndex == EliteVarietyContent.Equipment.AffixTinkerer.equipmentIndex)
+            {
+                CharacterBody body = self.GetComponent<CharacterBody>();
+                if (body && IsBodyTinkererDrone(body)) equipmentState = EquipmentState.empty;
+            }
+            return orig(self, equipmentState, slot);
         }
 
         public static int GetTinkererDroneDeployableSameSlotLimit(CharacterMaster self, int deployableCountMultiplier)
@@ -99,6 +131,7 @@ namespace EliteVariety.Buffs
                     _linkLines = value;
                 }
             }
+            public bool isDrone = false;
 
             public class StolenItemInfo
             {
@@ -113,6 +146,8 @@ namespace EliteVariety.Buffs
                 orbsInFlight = new List<ItemTransferOrb>();
                 droneMasters = new List<CharacterMaster>();
                 linkLines = new List<EliteVarietyAffixTinkererLinkLine>();
+
+                isDrone = IsBodyTinkererDrone(body);
             }
 
             public void FixedUpdate()
@@ -121,7 +156,7 @@ namespace EliteVariety.Buffs
                 {
                     if (body.master)
                     {
-                        if (droneSpawner == null)
+                        if (droneSpawner == null && !isDrone)
                         {
                             droneSpawner = new DeployableMinionSpawner(body.master, deployableSlot, new Xoroshiro128Plus(Run.instance.seed ^ (ulong)GetInstanceID()))
                             {
@@ -189,7 +224,8 @@ namespace EliteVariety.Buffs
                     if (droneMaster && droneMaster.inventory)
                     {
                         droneMaster.inventory.GiveItem(EliteVarietyContent.Items.TinkererDroneStatBonus);
-                        droneMaster.gameObject.AddComponent<EliteVarietyAffixTinkererRecipientBehavior>();
+                        EliteVarietyAffixTinkererRecipientBehavior recipientBehavior = droneMaster.gameObject.AddComponent<EliteVarietyAffixTinkererRecipientBehavior>();
+                        recipientBehavior.ownerMaster = body.master;
                     }
                     droneMaster.onBodyStart += DroneMaster_onBodyStart;
                 }
@@ -226,7 +262,7 @@ namespace EliteVariety.Buffs
                     }
                 }
                 public Inventory inventory;
-                public MinionOwnership minionOwnership;
+                public CharacterMaster ownerMaster;
                 public int healthDecaysGained = 0;
                 public static int globalHealthDecaysToGiveOnOwnerLost = 10;
 
@@ -236,15 +272,14 @@ namespace EliteVariety.Buffs
                     if (master)
                     {
                         inventory = master.inventory;
-                        minionOwnership = master.minionOwnership;
                     }
                 }
 
                 public void FixedUpdate()
                 {
-                    if (NetworkServer.active && minionOwnership)
+                    if (NetworkServer.active)
                     {
-                        if (minionOwnership.ownerMaster)
+                        if (ownerMaster)
                         {
                             if (healthDecaysGained != 0)
                             {
@@ -311,20 +346,6 @@ namespace EliteVariety.Buffs
             {
                 orbsInFlight.ForEach(x => OrbManager.instance.ForceImmediateArrival(x));
 
-                Vector3 emitPosition = transform.position;
-                if (body) emitPosition = body.corePosition;
-
-                foreach (KeyValuePair<Inventory, List<StolenItemInfo>> keyValuePair in stealDictionary)
-                {
-                    if (keyValuePair.Key)
-                    {
-                        foreach (StolenItemInfo stolenItemInfo in keyValuePair.Value)
-                        {
-                            ItemTransferOrb item = ItemTransferOrb.DispatchItemTransferOrb(emitPosition, keyValuePair.Key, stolenItemInfo.itemIndex, stolenItemInfo.count, null, stolenItemInfo.ownerBodyNetworkIdentity);
-                        }
-                    }
-                }
-
                 if (droneSpawner != null) droneSpawner.Dispose();
                 droneSpawner = null;
             }
@@ -336,7 +357,7 @@ namespace EliteVariety.Buffs
                 {
                     ItemDef itemDef = ItemCatalog.GetItemDef(itemIndex);
                     if (itemDef) {
-                        if (itemDef.canRemove && itemDef.DoesNotContainTag(ItemTag.CannotSteal) && inventory.GetItemCount(itemIndex) > 0)
+                        if (itemDef.canRemove && itemDef.DoesNotContainTag(ItemTag.CannotSteal) && itemDef.ContainsTag(ItemTag.Scrap) && inventory.GetItemCount(itemIndex) > 0)
                         {
                             itemsThatCanBeStolen.Add(itemIndex);
                         }
@@ -348,24 +369,6 @@ namespace EliteVariety.Buffs
                     ItemDef itemToStealDef = ItemCatalog.GetItemDef(itemToSteal);
                     int stealAmount = 1;
                     inventory.RemoveItem(itemToSteal, stealAmount);
-
-                    ItemDef scrap = RoR2Content.Items.ScrapWhite;
-                    switch (itemToStealDef.tier)
-                    {
-                        case ItemTier.Tier1:
-                            scrap = RoR2Content.Items.ScrapWhite;
-                            break;
-                        case ItemTier.Tier2:
-                            scrap = RoR2Content.Items.ScrapGreen;
-                            break;
-                        case ItemTier.Boss:
-                            scrap = RoR2Content.Items.ScrapYellow;
-                            break;
-                        case ItemTier.Tier3:
-                            scrap = RoR2Content.Items.ScrapRed;
-                            break;
-                    }
-                    ItemIndex scrapIndex = scrap.itemIndex;
 
                     if (!stealDictionary.ContainsKey(inventory)) stealDictionary.Add(inventory, new List<StolenItemInfo>());
                     StolenItemInfo stolenItemInfo = stealDictionary[inventory].FirstOrDefault(x => x.itemIndex == itemToSteal);
@@ -382,20 +385,8 @@ namespace EliteVariety.Buffs
 
                     ItemTransferOrb item = ItemTransferOrb.DispatchItemTransferOrb(emitPosition, null, itemToSteal, stealAmount, (orb) =>
                     {
-                        body.inventory.GiveItem(scrap, stealAmount);
+                        body.inventory.GiveItem(itemToSteal, stealAmount);
                         orbsInFlight.Remove(orb);
-
-                        foreach (CharacterMaster droneMaster in droneMasters)
-                        {
-                            CharacterBody droneBody = droneMaster.GetBody();
-                            if (droneBody)
-                            {
-                                ItemTransferOrb item2 = ItemTransferOrb.DispatchItemTransferOrb(body.corePosition, null, scrapIndex, stealAmount, (orb2) =>
-                                {
-                                    orbsInFlight.Remove(orb2);
-                                }, droneBody.networkIdentity);
-                            }
-                        }
                     }, body.networkIdentity);
                     orbsInFlight.Add(item);
                 }

@@ -44,7 +44,7 @@ namespace EliteVariety.Elites
 
             MysticsRisky2Utils.Overlays.CreateOverlay(Main.AssetBundle.LoadAsset<Material>("Assets/EliteVariety/Elites/ImpPlane/matEliteImpPlaneOverlay.mat"), (model) =>
             {
-                return model.body ? model.body.HasBuff(EliteVarietyContent.Buffs.AffixImpPlane) : false;
+                return model.body ? (model.body.HasBuff(EliteVarietyContent.Buffs.AffixImpPlane) || model.body.HasBuff(EliteVarietyContent.Buffs.ImpPlaneStare)) : false;
             });
         }
 

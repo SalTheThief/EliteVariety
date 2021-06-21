@@ -39,15 +39,15 @@ namespace EliteVariety.Buffs
 
             Utils.CopyChildren(Main.AssetBundle.LoadAsset<GameObject>("Assets/EliteVariety/Elites/Sandstorm/Sandstorm.prefab"), sandstormPrefab);
             NetworkedBodyAttachment networkedBodyAttachment = sandstormPrefab.AddComponent<NetworkedBodyAttachment>();
-            networkedBodyAttachment.shouldParentToAttachedBody = true;
+            networkedBodyAttachment.shouldParentToAttachedBody = false;
             networkedBodyAttachment.forceHostAuthority = true;
             TeamFilter teamFilter = sandstormPrefab.AddComponent<TeamFilter>();
             EliteVarietySandstormBehavior sandstormBehavior = sandstormPrefab.AddComponent<EliteVarietySandstormBehavior>();
             sandstormBehavior.colliderListComponent = sandstormPrefab.transform.Find("Collision").gameObject.AddComponent<MysticsRisky2Utils.MonoBehaviours.MysticsRisky2UtilsColliderTriggerList>();
             sandstormBehavior.indicator = sandstormPrefab.transform.Find("Indicator");
             sandstormBehavior.collision = sandstormPrefab.transform.Find("Collision");
-            sandstormPrefab.transform.Find("Collision").gameObject.layer = LayerIndex.world.intVal;
             sandstormPrefab.gameObject.layer = LayerIndex.fakeActor.intVal;
+            sandstormPrefab.transform.Find("Collision").gameObject.layer = LayerIndex.collideWithCharacterHullOnly.intVal;
 
             DestroyOnTimer destroyOnTimer = sandstormPrefab.transform.Find("Indicator").gameObject.AddComponent<DestroyOnTimer>();
             destroyOnTimer.duration = 10f;
@@ -138,8 +138,10 @@ namespace EliteVariety.Buffs
             public Transform indicator;
             public Transform collision;
 
-            public float damage = 0.1f;
-            public float dashDamage = 0.2f;
+            public Transform cachedTransform;
+
+            public float damage = 2.4f;
+            public float dashDamage = 4.8f;
             public float procCoefficient = 0.25f;
             public float dashProcCoefficient = 1f;
             public Vector3 force = Vector3.zero;
@@ -187,6 +189,7 @@ namespace EliteVariety.Buffs
                 bodiesHitThisTick = new List<CharacterBody>();
                 materialPropertyBlock = new MaterialPropertyBlock();
                 indicatorRendererRecolorInfos = new List<IndicatorRendererRecolorInfo>();
+                cachedTransform = transform;
             }
 
             public void Start()
@@ -205,6 +208,13 @@ namespace EliteVariety.Buffs
                             changedColor = changedColor
                         });
                     }
+                }
+            }
+
+            public void LateUpdate()
+            {
+                if (cachedTransform && networkedBodyAttachment.attachedBodyObject) {
+                    cachedTransform.position = networkedBodyAttachment.attachedBodyObject.transform.position;
                 }
             }
 
@@ -232,7 +242,7 @@ namespace EliteVariety.Buffs
             {
                 if (!NetworkServer.active || !networkedBodyAttachment || !networkedBodyAttachment.attachedBody || !networkedBodyAttachment.attachedBodyObject) return;
 
-                float currentTickDamage = (!dashActive ? damage : dashDamage) * networkedBodyAttachment.attachedBody.damage;
+                float currentTickDamage = !dashActive ? damage : dashDamage;
                 bool currentTickCrit = networkedBodyAttachment.attachedBody.RollCrit();
                 Vector3 currentTickForce = !dashActive ? force : dashForce;
                 Vector3 alignedForce = transform.forward * currentTickForce.x + transform.up * currentTickForce.y + transform.right * currentTickForce.z;
@@ -315,6 +325,10 @@ namespace EliteVariety.Buffs
             public void OnAttachedBodyDiscovered(NetworkedBodyAttachment networkedBodyAttachment, CharacterBody attachedBody)
             {
                 transform.position = attachedBody.footPosition;
+
+                float damageMultiplier = 1f + 0.2f * (attachedBody.level - 1);
+                damage *= damageMultiplier;
+                dashDamage *= damageMultiplier;
             }
 
             public class SyncRadius : INetMessage
@@ -389,8 +403,11 @@ namespace EliteVariety.Buffs
             public float speed = 30f;
             public float selfDestructTimer = 3f;
             public float acceleration = 200f;
-            public bool directionLock = true;
+            public bool directionLock = false;
             public Vector3 direction;
+            private Vector3 directionSmoothVelocity;
+            public float directionSmoothTime = 0.5f;
+            public bool passengerIsFlying = false;
 
             public bool aiControlled = false;
             public Vector3 aiTargetPosition;
@@ -414,16 +431,15 @@ namespace EliteVariety.Buffs
 
                     if (vehicleSeat && vehicleSeat.currentPassengerInputBank && vehicleSeat.currentPassengerBody)
                     {
-                        Vector3 chosenDirection = direction;
                         if (!directionLock)
                         {
                             Ray originalAimRay = vehicleSeat.currentPassengerInputBank.GetAimRay();
                             originalAimRay = CameraRigController.ModifyAimRayIfApplicable(originalAimRay, gameObject, out _);
-                            chosenDirection = originalAimRay.direction;
+                            direction = Vector3.SmoothDamp(direction, originalAimRay.direction, ref directionSmoothVelocity, directionSmoothTime);
                         }
-                        rigidbody.MoveRotation(Quaternion.LookRotation(chosenDirection));
-                        Vector3 targetVelocity = new Vector3(chosenDirection.x, 0f, chosenDirection.z) * speed * Mathf.Max(vehicleSeat.currentPassengerBody.moveSpeed / 7f, 1f);
-                        Vector3 currentVelocity = new Vector3(rigidbody.velocity.x, 0f, rigidbody.velocity.z);
+                        rigidbody.MoveRotation(Quaternion.LookRotation(direction));
+                        Vector3 targetVelocity = new Vector3(direction.x, passengerIsFlying ? direction.y : 0f, direction.z) * speed * Mathf.Max(vehicleSeat.currentPassengerBody.moveSpeed / 7f, 1f);
+                        Vector3 currentVelocity = new Vector3(rigidbody.velocity.x, passengerIsFlying ? rigidbody.velocity.y : 0f, rigidbody.velocity.z);
                         Vector3 velocityChange = Vector3.MoveTowards(currentVelocity, targetVelocity, acceleration * Time.fixedDeltaTime);
                         rigidbody.AddForce(velocityChange - currentVelocity, ForceMode.VelocityChange);
 
@@ -470,6 +486,8 @@ namespace EliteVariety.Buffs
                 rigidbody.rotation = Quaternion.LookRotation(aimDirection);
                 rigidbody.velocity = aimDirection * initialSpeed * Mathf.Max(passengerBody.moveSpeed / 7f, 1f);
                 direction = aimDirection;
+                passengerIsFlying = passengerBody.isFlying;
+                if (passengerIsFlying) rigidbody.useGravity = false;
                 if (NetworkServer.active) passengerBody.AddBuff(RoR2Content.Buffs.ArmorBoost);
                 transform.localScale = new Vector3(passengerBody.bestFitRadius, passengerBody.bestFitRadius, passengerBody.bestFitRadius);
 

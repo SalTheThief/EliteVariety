@@ -148,6 +148,7 @@ namespace EliteVariety.CharacterBodies
             EliteVarietyContent.Resources.entityStateTypes.Add(typeof(TinkererDroneSpawnState));
             EliteVarietyContent.Resources.entityStateTypes.Add(typeof(TinkererDroneChargeLaser));
             EliteVarietyContent.Resources.entityStateTypes.Add(typeof(TinkererDroneFireLaser));
+            EliteVarietyContent.Resources.entityStateTypes.Add(typeof(TinkererDroneLaserDowntime));
             EliteVarietyContent.Resources.entityStateTypes.Add(typeof(TinkererDroneDeath));
 
             // skills
@@ -156,8 +157,8 @@ namespace EliteVariety.CharacterBodies
             skillFire.skillName = "Fire";
             skillFire.activationStateMachineName = "Weapon";
             skillFire.activationState = new EntityStates.SerializableEntityStateType(typeof(TinkererDroneChargeLaser));
-            skillFire.interruptPriority = EntityStates.InterruptPriority.Skill;
-            skillFire.baseRechargeInterval = 2f;
+            skillFire.interruptPriority = EntityStates.InterruptPriority.Any;
+            skillFire.baseRechargeInterval = 0f;
             skillFire.baseMaxStock = 1;
             skillFire.rechargeStock = 1;
             skillFire.requiredStock = 1;
@@ -415,7 +416,7 @@ namespace EliteVariety.CharacterBodies
             public static GameObject hitEffectPrefab;
             public static float damageCoefficient = 3f;
             public static float force = 2000f;
-            public static float laserRadius = 0.6f;
+            public static float laserRadius = 0.1f;
             public static float procCoefficient = 1f;
 
             public float duration;
@@ -470,8 +471,65 @@ namespace EliteVariety.CharacterBodies
                         tracerEffectPrefab = tracerEffectPrefab,
                         weapon = gameObject
                     };
+                    bulletAttack.filterCallback = (ref BulletAttack.BulletHit hitInfo) =>
+                    {
+                        bool IsWorldLayerTriggerCollider(Transform transform)
+                        {
+                            return transform && transform.gameObject.name == "WorldLayerTriggerCollider" && transform.gameObject.layer == LayerIndex.world.intVal;
+                        }
+                        if (hitInfo.entityObject)
+                        {
+                            if (IsWorldLayerTriggerCollider(hitInfo.entityObject.transform)
+                            || IsWorldLayerTriggerCollider(hitInfo.entityObject.transform.Find("WorldLayerTriggerCollider")))
+                                return true;
+                        }
+                        return bulletAttack.DefaultFilterCallback(ref hitInfo);
+                    };
+                    bulletAttack.hitCallback = (ref BulletAttack.BulletHit hitInfo) =>
+                    {
+                        bool IsWorldLayerTriggerCollider(Transform transform)
+                        {
+                            return transform && transform.gameObject.name == "WorldLayerTriggerCollider" && transform.gameObject.layer == LayerIndex.world.intVal;
+                        }
+                        if (hitInfo.entityObject)
+                        {
+                            if (IsWorldLayerTriggerCollider(hitInfo.entityObject.transform)
+                            || IsWorldLayerTriggerCollider(hitInfo.entityObject.transform.Find("WorldLayerTriggerCollider")))
+                                return false;
+                        }
+                        return bulletAttack.DefaultHitCallback(ref hitInfo);
+                    };
                     bulletAttack.Fire();
                 }
+            }
+
+            public override void FixedUpdate()
+            {
+                base.FixedUpdate();
+                if (fixedAge >= duration && isAuthority)
+                {
+                    outer.SetNextState(new TinkererDroneLaserDowntime());
+                    return;
+                }
+            }
+
+            public override EntityStates.InterruptPriority GetMinimumInterruptPriority()
+            {
+                return EntityStates.InterruptPriority.Skill;
+            }
+        }
+
+        public class TinkererDroneLaserDowntime : EntityStates.BaseState
+        {
+            public static float baseDuration = 2f;
+
+            public float duration;
+
+            public override void OnEnter()
+            {
+                base.OnEnter();
+
+                duration = baseDuration / attackSpeedStat;
             }
 
             public override void FixedUpdate()
@@ -501,7 +559,7 @@ namespace EliteVariety.CharacterBodies
 
         public class TinkererDroneSpawnState : EntityStates.BaseState
         {
-            public static float duration = 1.5f;
+            public static float duration = 2f;
             public static string spawnSoundString = "Play_drone_repair";
 
             public override void OnEnter()

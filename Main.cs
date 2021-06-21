@@ -26,7 +26,7 @@ namespace EliteVariety
     {
         public const string PluginGUID = "com.themysticsword.elitevariety";
         public const string PluginName = "EliteVariety";
-        public const string PluginVersion = "1.0.0";
+        public const string PluginVersion = "1.0.1";
 
         internal static BepInEx.Logging.ManualLogSource logger;
 
@@ -231,6 +231,7 @@ namespace EliteVariety
 
         public static class Items
         {
+            public static ItemDef AllItemDisplaysItem;
             public static ItemDef TinkererDroneStatBonus;
         }
 
@@ -255,6 +256,7 @@ namespace EliteVariety
             public static BuffDef ArmoredHeavyStun;
             public static BuffDef ArmoredSelfBuff;
             public static BuffDef ImpPlaneImpaled;
+            public static BuffDef ImpPlaneStare;
             public static BuffDef SandstormBlind;
         }
 
