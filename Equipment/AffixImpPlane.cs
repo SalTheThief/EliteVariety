@@ -267,6 +267,11 @@ namespace EliteVariety.Equipment
                             blinkInStarted = true;
 
                             blinkInObject = Object.Instantiate<GameObject>(blinkInEffectPrefab, destination, Quaternion.identity);
+                            TeamAreaIndicator teamIndicator = blinkInObject.GetComponentInChildren<TeamAreaIndicator>();
+                            if (teamIndicator)
+                            {
+                                teamIndicator.transform.localScale = Vector3.one * (blinkRadius + body.radius);
+                            }
                         }
 
                         SetPositionToDestination();
