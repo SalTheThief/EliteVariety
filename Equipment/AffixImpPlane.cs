@@ -9,18 +9,22 @@ using R2API.Networking;
 using RoR2.Orbs;
 using R2API;
 using UnityEngine.Events;
+using UnityEngine.Rendering.PostProcessing;
 
 namespace EliteVariety.Equipment
 {
     public class AffixImpPlane : BaseEliteAffix
     {
-        public static DeployableSlot deployableSlot;
+        public static GameObject blinkEffectPrefab;
+        public static GameObject blinkInEffectPrefab;
 
         public override void PreLoad()
         {
             base.PreLoad();
             equipmentDef.name = "AffixImpPlane";
-            equipmentDef.cooldown = 90f;
+            equipmentDef.cooldown = 30f;
+
+            NetworkingAPI.RegisterMessageType<EliteVarietyImpPlaneBlink.SyncBlink>();
         }
 
         public override void OnLoad()
@@ -96,6 +100,55 @@ namespace EliteVariety.Equipment
 
         public override void AspectAbilitiesSupport()
         {
+            blinkEffectPrefab = PrefabAPI.InstantiateClone(Main.AssetBundle.LoadAsset<GameObject>("Assets/EliteVariety/Elites/ImpPlane/BlinkEffect.prefab"), Main.TokenPrefix + "AffixImpPlaneBlinkEffect", false);
+            PostProcessDuration ppDuration = blinkEffectPrefab.transform.Find("PP").gameObject.AddComponent<PostProcessDuration>();
+            ppDuration.ppWeightCurve = new AnimationCurve
+            {
+                keys = new Keyframe[]
+                {
+                    new Keyframe(0f, 1f),
+                    new Keyframe(1f, 0f)
+                }
+            };
+            ppDuration.maxDuration = 0.5f;
+            ppDuration.destroyOnEnd = false;
+            ppDuration.ppVolume = ppDuration.GetComponent<PostProcessVolume>();
+            ShakeEmitter shakeEmitter = blinkEffectPrefab.AddComponent<ShakeEmitter>();
+            shakeEmitter.amplitudeTimeDecay = true;
+            shakeEmitter.duration = 0.5f;
+            shakeEmitter.wave = new Wave
+            {
+                amplitude = 4f,
+                frequency = 0.6f
+            };
+            DestroyOnTimer destroyOnTimer = blinkEffectPrefab.AddComponent<DestroyOnTimer>();
+            destroyOnTimer.duration = 2f;
+            EffectComponent effectComponent = blinkEffectPrefab.AddComponent<EffectComponent>();
+            effectComponent.applyScale = true;
+            VFXAttributes vfxAttributes = blinkEffectPrefab.AddComponent<VFXAttributes>();
+            vfxAttributes.vfxIntensity = VFXAttributes.VFXIntensity.Medium;
+            vfxAttributes.vfxPriority = VFXAttributes.VFXPriority.Always;
+            EliteVarietyContent.Resources.effectPrefabs.Add(blinkEffectPrefab);
+
+            blinkInEffectPrefab = PrefabAPI.InstantiateClone(Main.AssetBundle.LoadAsset<GameObject>("Assets/EliteVariety/Elites/ImpPlane/BlinkInEffect.prefab"), Main.TokenPrefix + "AffixImpPlaneBlinkInEffect", false);
+            ppDuration = blinkInEffectPrefab.transform.Find("PP").gameObject.AddComponent<PostProcessDuration>();
+            ppDuration.ppWeightCurve = new AnimationCurve
+            {
+                keys = new Keyframe[]
+                {
+                    new Keyframe(0f, 0f),
+                    new Keyframe(1f, 1f)
+                }
+            };
+            ppDuration.maxDuration = 0.5f;
+            ppDuration.destroyOnEnd = false;
+            ppDuration.ppVolume = ppDuration.GetComponent<PostProcessVolume>();
+            GameObject teamIndicator = PrefabAPI.InstantiateClone(Resources.Load<GameObject>("Prefabs/Projectiles/PoisonStakeProjectile").transform.Find("ActiveVisuals/TeamAreaIndicator, FullSphere").gameObject, Main.TokenPrefix + "AffixImpPlaneTeamIndicator", false);
+            Object.Destroy(teamIndicator.transform.Find("ProximityDetonator").gameObject);
+            teamIndicator.transform.SetParent(blinkInEffectPrefab.transform);
+            teamIndicator.transform.localPosition = Vector3.zero;
+            teamIndicator.transform.localScale = Vector3.one;
+
             GameObject targetFinderVisualizerPrefab = PrefabAPI.InstantiateClone(Resources.Load<GameObject>("Prefabs/WoodSpriteIndicator"), Main.TokenPrefix + "ImpPlaneAspectAbilityIndicator", false);
             Object.Destroy(targetFinderVisualizerPrefab.GetComponentInChildren<Rewired.ComponentControls.Effects.RotateAroundAxis>());
             targetFinderVisualizerPrefab.GetComponentInChildren<SpriteRenderer>().sprite = Main.AssetBundle.LoadAsset<Sprite>("Assets/EliteVariety/Elites/ImpPlane/texImpPlaneAspectAbilityIndicator.png");
@@ -107,7 +160,7 @@ namespace EliteVariety.Equipment
             targetFinderVisualizerPrefab.GetComponentInChildren<ObjectScaleCurve>().overallCurve.AddKey(0.5f, 1f);
             targetFinderVisualizerPrefab.GetComponentInChildren<ObjectScaleCurve>().overallCurve.AddKey(1f, 1f);
 
-            deployableSlot = DeployableAPI.RegisterDeployableSlot(GetImpPlaneDeployableSameSlotLimit);
+            On.RoR2.CharacterBody.Awake += CharacterBody_Awake;
 
             UseTargetFinder(TargetFinderType.Enemies, targetFinderVisualizerPrefab);
             AspectAbilities.AspectAbilitiesPlugin.RegisterAspectAbility(new AspectAbilities.AspectAbility
@@ -115,64 +168,23 @@ namespace EliteVariety.Equipment
                 equipmentDef = equipmentDef,
                 onUseOverride = (equipmentSlot) =>
                 {
-                    if (equipmentSlot.characterBody && equipmentSlot.characterBody.master)
+                    if (equipmentSlot.characterBody)
                     {
-                        int deployableCount = equipmentSlot.characterBody.master.GetDeployableCount(deployableSlot);
-                        int deployableSameSlotLimit = equipmentSlot.characterBody.master.GetDeployableSameSlotLimit(deployableSlot);
-                        if (deployableCount < deployableSameSlotLimit) {
                         MysticsRisky2UtilsEquipmentTarget targetInfo = equipmentSlot.GetComponent<MysticsRisky2UtilsEquipmentTarget>();
-                            if (targetInfo && targetInfo.obj)
+                        if (targetInfo && targetInfo.obj)
+                        {
+                            HurtBox targetHB = targetInfo.obj.GetComponent<CharacterBody>().mainHurtBox;
+                            if (targetHB)
                             {
-                                CharacterMaster master = equipmentSlot.characterBody.master;
-                                if (master)
+                                EliteVarietyImpPlaneBlink blinkComponent = equipmentSlot.GetComponent<EliteVarietyImpPlaneBlink>();
+                                if (blinkComponent)
                                 {
-                                    HurtBox targetHB = targetInfo.obj.GetComponent<CharacterBody>().mainHurtBox;
-                                    if (targetHB)
-                                    {
-                                        DirectorSpawnRequest directorSpawnRequest = new DirectorSpawnRequest((SpawnCard)Resources.Load("SpawnCards/CharacterSpawnCards/cscImpBoss"), new DirectorPlacementRule
-                                        {
-                                            placementMode = DirectorPlacementRule.PlacementMode.NearestNode,
-                                            spawnOnTarget = targetHB.transform
-                                        }, RoR2Application.rng)
-                                        {
-                                            summonerBodyObject = equipmentSlot.characterBody.gameObject
-                                        };
-                                        directorSpawnRequest.onSpawnedServer += (spawnResult) =>
-                                        {
-                                            GameObject summonedMasterObject = spawnResult.spawnedInstance;
-                                            if (summonedMasterObject)
-                                            {
-                                                CharacterMaster summonedMaster = summonedMasterObject.GetComponent<CharacterMaster>();
-                                                summonedMaster.inventory.GiveItem(RoR2Content.Items.HealthDecay, 20);
-                                                summonedMaster.inventory.GiveItem(RoR2Content.Items.AlienHead, 3);
-                                                foreach (RoR2.CharacterAI.BaseAI ai in summonedMaster.aiComponents)
-                                                {
-                                                    ai.currentEnemy.gameObject = targetHB.healthComponent.gameObject;
-                                                    ai.currentEnemy.bestHurtBox = targetHB;
-                                                }
+                                    Vector3 destination = targetHB.transform.position;
+                                    destination += equipmentSlot.transform.position - equipmentSlot.characterBody.footPosition;
+                                    blinkComponent.Blink(destination);
 
-                                                Deployable deployable = summonedMasterObject.AddComponent<Deployable>();
-                                                deployable.onUndeploy = (deployable.onUndeploy ?? new UnityEvent());
-                                                if (summonedMaster)
-                                                {
-                                                    deployable.onUndeploy.AddListener(new UnityAction(summonedMaster.TrueKill));
-                                                }
-                                                else
-                                                {
-                                                    deployable.onUndeploy.AddListener(delegate ()
-                                                    {
-                                                        UnityEngine.Object.Destroy(summonedMasterObject);
-                                                    });
-                                                }
-
-                                                equipmentSlot.characterBody.master.AddDeployable(deployable, deployableSlot);
-                                            }
-                                        };
-                                        DirectorCore.instance.TrySpawnObject(directorSpawnRequest);
-
-                                        targetInfo.Invalidate();
-                                        return true;
-                                    }
+                                    targetInfo.Invalidate();
+                                    return true;
                                 }
                             }
                         }
@@ -182,9 +194,237 @@ namespace EliteVariety.Equipment
             });
         }
 
-        public static int GetImpPlaneDeployableSameSlotLimit(CharacterMaster self, int deployableCountMultiplier)
+        private void CharacterBody_Awake(On.RoR2.CharacterBody.orig_Awake orig, CharacterBody self)
         {
-            return 1 * deployableCountMultiplier;
+            orig(self);
+            self.gameObject.AddComponent<EliteVarietyImpPlaneBlink>();
+        }
+
+        public class EliteVarietyImpPlaneBlink : MonoBehaviour
+        {
+            public CharacterBody body;
+            public Animator animator;
+            public CharacterModel characterModel;
+            public HurtBoxGroup hurtboxGroup;
+            public ChildLocator childLocator;
+            public Transform modelTransform;
+
+            public GameObject blinkInObject;
+            public bool blinking = false;
+            public bool blinkInStarted = false;
+            public float stopwatch = 0f;
+
+            public float baseBlinkOutDuration = 0.5f;
+            public float baseBlinkInDuration = 1f;
+
+            public float blinkOutDuration = 1f;
+            public float blinkInDuration = 1f;
+            public float blinkDuration
+            {
+                get
+                {
+                    return blinkInDuration + blinkOutDuration;
+                }
+            }
+            public float blinkDamage = 500f;
+            public float blinkProcCoefficient = 1f;
+            public float blinkForce = 1000f;
+            public float blinkRadius = 7f;
+
+            public Vector3 destination;
+            public Vector3 direction;
+
+            public static Material destealthMaterial;
+
+            public void Awake()
+            {
+                body = GetComponent<CharacterBody>();
+
+                ModelLocator modelLocator = body.modelLocator;
+                if (modelLocator)
+                {
+                    modelTransform = modelLocator.modelTransform;
+                    if (modelTransform)
+                    {
+                        animator = modelTransform.GetComponent<Animator>();
+                        characterModel = modelTransform.GetComponent<CharacterModel>();
+                        hurtboxGroup = modelTransform.GetComponent<HurtBoxGroup>();
+                        childLocator = modelTransform.GetComponent<ChildLocator>();
+                    }
+                }
+            }
+
+            public void FixedUpdate()
+            {
+                if (blinking)
+                {
+                    stopwatch += Time.fixedDeltaTime;
+
+                    if (stopwatch >= blinkOutDuration)
+                    {
+                        if (!blinkInStarted)
+                        {
+                            blinkInStarted = true;
+
+                            blinkInObject = Object.Instantiate<GameObject>(blinkInEffectPrefab, destination, Quaternion.identity);
+                        }
+
+                        SetPositionToDestination();
+                    }
+                    
+                    if (stopwatch >= blinkDuration)
+                    {
+                        EndBlink();
+                    }
+                }
+            }
+
+            public void CreateBlinkEffect(Vector3 position)
+            {
+                EffectManager.SpawnEffect(blinkEffectPrefab, new EffectData
+                {
+                    origin = position,
+                    scale = blinkRadius + body.radius
+                }, false);
+            }
+
+            public void SetPositionToDestination()
+            {
+                if (body.characterMotor)
+                {
+                    if (body.characterDirection) body.characterMotor.velocity = Vector3.zero;
+                    body.characterMotor.Motor.SetPositionAndRotation(destination, Quaternion.identity, true);
+                }
+                else
+                {
+                    if (body.rigidbody) body.rigidbody.interpolation = RigidbodyInterpolation.None;
+                    body.transform.SetPositionAndRotation(destination, Quaternion.identity);
+                    if (body.rigidbody)
+                    {
+                        body.rigidbody.position = destination;
+                        body.rigidbody.rotation = Quaternion.identity;
+                    }
+                }
+            }
+
+            public void Blink(Vector3 destination)
+            {
+                if (blinking) EndBlink();
+                stopwatch = 0f;
+
+                blinking = true;
+                blinkInStarted = false;
+
+                this.destination = destination;
+                this.direction = (destination - body.corePosition).normalized;
+
+                blinkOutDuration = baseBlinkOutDuration / body.attackSpeed;
+                blinkInDuration = baseBlinkInDuration / body.attackSpeed;
+
+                CreateBlinkEffect(body.corePosition);
+                Util.PlayAttackSpeedSound("Play_imp_overlord_teleport_start", gameObject, body.attackSpeed);
+
+                if (characterModel) characterModel.invisibilityCount++;
+                if (hurtboxGroup) hurtboxGroup.hurtBoxesDeactivatorCounter++;
+
+                gameObject.layer = LayerIndex.fakeActor.intVal;
+                if (body.characterMotor)
+                {
+                    body.characterMotor.enabled = false;
+                    body.characterMotor.Motor.RebuildCollidableLayers();
+                }
+
+                if (NetworkServer.active)
+                {
+                    new SyncBlink(gameObject.GetComponent<NetworkIdentity>().netId, destination).Send(NetworkDestination.Clients);
+                }
+            }
+
+            public class SyncBlink : INetMessage
+            {
+                NetworkInstanceId objID;
+                Vector3 destination;
+
+                public SyncBlink()
+                {
+                }
+
+                public SyncBlink(NetworkInstanceId objID, Vector3 destination)
+                {
+                    this.objID = objID;
+                    this.destination = destination;
+                }
+
+                public void Deserialize(NetworkReader reader)
+                {
+                    objID = reader.ReadNetworkId();
+                    destination = reader.ReadVector3();
+                }
+
+                public void OnReceived()
+                {
+                    if (NetworkServer.active) return;
+                    GameObject obj = Util.FindNetworkObject(objID);
+                    if (obj)
+                    {
+                        EliteVarietyImpPlaneBlink controller = obj.GetComponent<EliteVarietyImpPlaneBlink>();
+                        controller.Blink(destination);
+                    }
+                }
+
+                public void Serialize(NetworkWriter writer)
+                {
+                    writer.Write(objID);
+                    writer.Write(destination);
+                }
+            }
+
+            public void EndBlink()
+            {
+                SetPositionToDestination();
+
+                blinking = false;
+
+                if (body.characterDirection) body.characterDirection.forward = direction;
+
+                gameObject.layer = LayerIndex.defaultLayer.intVal;
+                if (body.characterMotor) body.characterMotor.Motor.RebuildCollidableLayers();
+
+                Util.PlayAttackSpeedSound("Play_imp_overlord_teleport_end", gameObject, body.attackSpeed);
+                CreateBlinkEffect(body.corePosition);
+
+                if (NetworkServer.active)
+                {
+                    new BlastAttack
+                    {
+                        attacker = gameObject,
+                        inflictor = gameObject,
+                        teamIndex = TeamComponent.GetObjectTeam(gameObject),
+                        baseDamage = blinkDamage * (1f + 0.2f * ((float)body.level - 1f)) * blinkProcCoefficient,
+                        baseForce = blinkForce,
+                        position = destination,
+                        radius = blinkRadius + body.radius,
+                        falloffModel = BlastAttack.FalloffModel.Linear,
+                        attackerFiltering = AttackerFiltering.NeverHit
+                    }.Fire();
+                }
+
+                if (modelTransform && destealthMaterial)
+                {
+                    TemporaryOverlay temporaryOverlay = animator.gameObject.AddComponent<TemporaryOverlay>();
+                    temporaryOverlay.duration = 1f;
+                    temporaryOverlay.destroyComponentOnEnd = true;
+                    temporaryOverlay.originalMaterial = destealthMaterial;
+                    temporaryOverlay.inspectorCharacterModel = animator.gameObject.GetComponent<CharacterModel>();
+                    temporaryOverlay.alphaCurve = AnimationCurve.EaseInOut(0f, 1f, 1f, 0f);
+                    temporaryOverlay.animateShaderAlpha = true;
+                }
+                if (characterModel) characterModel.invisibilityCount--;
+                if (hurtboxGroup) hurtboxGroup.hurtBoxesDeactivatorCounter--;
+
+                if (blinkInObject) Object.Destroy(blinkInObject);
+                if (body.characterMotor) body.characterMotor.enabled = true;
+            }
         }
     }
 }
