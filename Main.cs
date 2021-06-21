@@ -26,7 +26,7 @@ namespace EliteVariety
     {
         public const string PluginGUID = "com.themysticsword.elitevariety";
         public const string PluginName = "EliteVariety";
-        public const string PluginVersion = "1.0.1";
+        public const string PluginVersion = "1.0.2";
 
         internal static BepInEx.Logging.ManualLogSource logger;
 
