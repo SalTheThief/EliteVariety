@@ -126,9 +126,12 @@ namespace EliteVariety.Buffs
         {
             public CharacterBody body;
             public InputBankTest inputBank;
-            public float stareTimer = 0f;
-            public float stareTimerDuration = 0.2f;
-            public float buffDuration = 1f;
+            public float stareCheckTimer = 0f;
+            public float stareCheckTimerDuration = 0.1f;
+            public float buffBuildupTimer = 0f;
+            public float buffBuildupDuration = 1f;
+            public float buffDuration = 1.5f;
+            public float buffDecayDuration = 0.3f;
             public bool staring = false;
             public GameObject colliderObject;
             public MysticsRisky2UtilsColliderTriggerList colliderTriggerList;
@@ -142,7 +145,7 @@ namespace EliteVariety.Buffs
                 colliderObject = Object.Instantiate(stareColliderPrefab);
                 colliderTransform = colliderObject.transform;
                 colliderTriggerList = colliderObject.GetComponentInChildren<MysticsRisky2UtilsColliderTriggerList>();
-                AdjustCollider(5f, 1000f);
+                AdjustCollider(10f, 1000f);
             }
 
             public void AdjustCollider(float width, float length)
@@ -154,19 +157,40 @@ namespace EliteVariety.Buffs
             {
                 if (body)
                 {
-                    stareTimer -= Time.fixedDeltaTime;
-                    if (stareTimer <= 0f)
+                    stareCheckTimer -= Time.fixedDeltaTime;
+                    if (stareCheckTimer <= 0f)
                     {
-                        stareTimer = stareTimerDuration;
+                        stareCheckTimer = stareCheckTimerDuration;
 
                         staring = IsStaringAtImpPlaneElite();
-                        if (staring)
+                    }
+
+                    if (staring)
+                    {
+                        buffBuildupTimer += Time.fixedDeltaTime;
+                        if (buffBuildupTimer >= buffBuildupDuration)
                         {
+                            buffBuildupTimer = 0f;
+
                             if (NetworkServer.active)
                             {
-                                body.AddTimedBuff(RoR2Content.Buffs.DeathMark, buffDuration);
+                                BuffDef buffDef = EliteVarietyContent.Buffs.ImpPlaneStare;
+                                int c = 1;
+                                foreach (CharacterBody.TimedBuff timedBuff in body.timedBuffs)
+                                {
+                                    if (timedBuff.buffIndex == buffDef.buffIndex)
+                                    {
+                                        timedBuff.timer = buffDuration + buffDecayDuration * c;
+                                        c++;
+                                    }
+                                }
+                                body.AddTimedBuff(buffDef, buffDuration);
                             }
                         }
+                    }
+                    else
+                    {
+                        buffBuildupTimer = Mathf.Max(buffBuildupTimer - Time.fixedDeltaTime, 0f);
                     }
                 }
             }
