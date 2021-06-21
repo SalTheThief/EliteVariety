@@ -1,3 +1,5 @@
+#### 1.0.2:
+* Fixed Tinkerer's Drones being able to use the Tinkering on-use ability if they inherit the aspect equipment
 #### 1.0.1:
 * Arenaceous:
 	* The sandstorm now deals a fixed amount of damage that scales with level instead of dealing a percentage of the owner's damage
