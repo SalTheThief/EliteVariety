@@ -131,7 +131,7 @@ namespace EliteVariety.Buffs
             public float buffBuildupTimer = 0f;
             public float buffBuildupDuration = 1f;
             public float buffDuration = 1.5f;
-            public float buffDecayDuration = 0.3f;
+            public float buffDecayDuration = 0.5f;
             public bool staring = false;
             public GameObject colliderObject;
             public MysticsRisky2UtilsColliderTriggerList colliderTriggerList;
